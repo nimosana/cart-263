@@ -19,7 +19,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     /** moves an enemy, targeting the user, and shooting at random */
     static enemyMove(enemy, scene) {
-        (Phaser.Math.Between(0, 500) < 1) && Bullet.fireEnemyBullet(scene, enemy);
+        (Phaser.Math.Between(0, 500) < 1) && enemy.fireEnemyBullet(scene);
         let angleToTarget = Phaser.Math.Angle.Between(enemy.x, enemy.y, scene.user.x, scene.user.y);
         let rotationDelta = Phaser.Math.Angle.RotateTo(enemy.rotation, angleToTarget, 0.03);
         enemy.setRotation(rotationDelta); let speed = 3000;
@@ -36,6 +36,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always
     }
 
+    /** makes enemies fire bullets */
+    fireEnemyBullet(scene) {
+        let soundDist = (((Phaser.Math.Clamp(Phaser.Math.Distance.Between(scene.user.x, scene.user.y, this.x, this.y) / 700, 0, 1)) - 1) * -1);
+        scene.sound.add('shoot').play({ volume: soundDist });
+        let bullet = new Bullet(scene, this.x, this.y, 'bullet')
+            .setVelocity(scene.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, scene.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
+            .setTint(0xff0000);
+        bullet.body.setMass(200);
+        bullet.angle = this.body.rotation + 90;
+        scene.bulletsEnemies.add(bullet);
+    }
 
     enemyHit(scene, bullet) {
         this.hp -= 50;

@@ -1,5 +1,5 @@
 class Scores {
-
+    /** creates the text objects required to display the score, kills or death of the user  */
     static initText(scene) {
         scene.scoreText = scene.add.text(0, 0, '', { fontSize: '32px', fontFamily: 'IMPACT', fill: '#ffffff' })
             .setAlign('left')

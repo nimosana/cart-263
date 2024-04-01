@@ -71,6 +71,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         scene.bulletsEnemies.remove(bullet);
         scene.removeObj(bullet);
         if (this.hp < 1) {
+            scene.myVoice.speak(`Thank you for your service`);
             scene.gameLost = true;
             scene.diedText.setAlpha(1);
             scene.sound.add('scream').play({ volume: 1 });
