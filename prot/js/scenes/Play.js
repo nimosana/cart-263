@@ -11,6 +11,7 @@ class Play extends Phaser.Scene {
         this.saidWow = false;
         this.gameLost = false;
         this.myVoice = new p5.Speech();
+        this.seaBlood = 0;
     }
 
     /** Creates the initial scene and elements for the war game */
@@ -42,6 +43,9 @@ class Play extends Phaser.Scene {
 
     /** Updates the scene/game */
     update() {
+        this.seaBlood = Math.min(Math.max(this.score, 0), 255);
+        console.log(this.seaBlood)
+        this.ground.setTint((`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1)));
         this.user.userMovement(this);
         this.bulletsPlayer.children.each(bullet => { this.removeBullets(bullet, this.bulletsPlayer) });
         this.bulletsEnemies.children.each(bullet => { this.removeBullets(bullet, this.bulletsEnemies) });
