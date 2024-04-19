@@ -19,10 +19,12 @@ let config = {
             gravity: { y: 0 }
         }
     },
-    scene: [Boot, Play]
+    scene: [Boot, Level1, Level2]
 };
 
 let game = new Phaser.Game(config);
+let infernoStage = 1;
+let bulletTypes = ['nothin', 'rock', `bullet`];
 
 /** move the background of the html site */
 function moveBackground() {

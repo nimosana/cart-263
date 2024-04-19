@@ -8,41 +8,42 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.hp = 100;
     }
 
-    /** spawns an enemy in a random corner */
-    static spawnEnemies(scene) {
-        if (scene.enemies.getLength() < scene.kills || scene.firstSpawn) {
-            scene.firstSpawn = false;
-            let randomizer = Phaser.Math.Between(-1000, 1000);
-            scene.enemies.add(new Enemy(scene, scene.user.x + Math.sign(randomizer) * scene.scale.width / 2, scene.user.y + Math.sign(randomizer) * scene.scale.height / 2, `enemy`));
-        }
-    }
+    // /** spawns an enemy in a random corner */
+    // static spawnEnemies(scene) {
+    //     if (scene.enemies.getLength() < scene.kills || scene.firstSpawn) {
+    //         scene.firstSpawn = false;
+    //         let randomizer = Phaser.Math.Between(-1000, 1000);
+    //         scene.enemies.add(new Enemy(scene, scene.user.x + Math.sign(randomizer) * scene.scale.width / 2, scene.user.y + Math.sign(randomizer) * scene.scale.height / 2, `enemy`));
+    //     }
+    // }
 
-    /** moves an enemy, targeting the user, and shooting at random */
-    static enemyMove(enemy, scene) {
-        (Phaser.Math.Between(0, 500) < 1) && enemy.fireEnemyBullet(scene);
-        let angleToTarget = Phaser.Math.Angle.Between(enemy.x, enemy.y, scene.user.x, scene.user.y);
-        let rotationDelta = Phaser.Math.Angle.RotateTo(enemy.rotation, angleToTarget, 0.03);
-        enemy.setRotation(rotationDelta); let speed = 3000;
-        //slow or accelerate movement depending on angle vs user
-        if (Math.abs(enemy.rotation - angleToTarget) > Math.PI / 2) {
-            speed = 750;
-        } else if (Math.abs(enemy.rotation - angleToTarget) > Math.PI / 4) {
-            speed = 1000;
-        }
-        if (Phaser.Math.Distance.Between(enemy.x, enemy.y, scene.user.x, scene.user.y) < scene.scale.width / 4) {
-            speed = 1500;
-        }
-        scene.physics.velocityFromRotation(enemy.rotation, speed, enemy.body.acceleration);
-        enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always
-    }
+    // /** moves an enemy, targeting the user, and shooting at random */
+    // static enemyMove(enemy, scene) {
+    //     (Phaser.Math.Between(0, 500) < 1) && enemy.fireEnemyBullet(scene);
+    //     let angleToTarget = Phaser.Math.Angle.Between(enemy.x, enemy.y, scene.user.x, scene.user.y);
+    //     let rotationDelta = Phaser.Math.Angle.RotateTo(enemy.rotation, angleToTarget, 0.03);
+    //     enemy.setRotation(rotationDelta);
+    //     let speed = 3000;
+    //     //slow or accelerate movement depending on angle vs user
+    //     if (Math.abs(enemy.rotation - angleToTarget) > Math.PI / 2) {
+    //         speed = 750;
+    //     } else if (Math.abs(enemy.rotation - angleToTarget) > Math.PI / 4) {
+    //         speed = 1000;
+    //     }
+    //     if (Phaser.Math.Distance.Between(enemy.x, enemy.y, scene.user.x, scene.user.y) < scene.scale.width / 4) {
+    //         speed = 1500;
+    //     }
+    //     scene.physics.velocityFromRotation(enemy.rotation, speed, enemy.body.acceleration);
+    //     enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always
+    // }
 
     /** makes enemies fire bullets */
     fireEnemyBullet(scene) {
         let soundDist = (((Phaser.Math.Clamp(Phaser.Math.Distance.Between(scene.user.x, scene.user.y, this.x, this.y) / 700, 0, 1)) - 1) * -1);
         scene.sound.add('shoot').play({ volume: soundDist });
-        let bullet = new Bullet(scene, this.x, this.y, 'bullet')
+        let bullet = new Bullet(scene, this.x, this.y, bulletTypes[infernoStage])
             .setVelocity(scene.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, scene.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
-            .setTint(0xff0000);
+        // .setTint(0xff0000);
         bullet.body.setMass(200);
         bullet.angle = this.body.rotation + 90;
         scene.bulletsEnemies.add(bullet);

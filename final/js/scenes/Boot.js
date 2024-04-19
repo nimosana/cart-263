@@ -6,10 +6,13 @@ class Boot extends Phaser.Scene {
     preload() {
         let comboSounds = 11;
         this.load.image(`user`, `assets/images/plane2.png`);
+        this.load.image(`user-1`, `assets/images/user-1.png`);
         this.load.image(`enemy`, `assets/images/plane1.png`);
         this.load.image(`boat`, `assets/images/boat3.png`);
         this.load.image(`bullet`, `assets/images/bullet.png`);
-        this.load.image('sea', 'assets/images/sea.jpg');
+        this.load.image('sea', `assets/images/sea.jpg`);
+        this.load.image('sand', `assets/images/sand.png`);
+        this.load.image('rock', `assets/images/rock.png`)
         this.load.image('heart', 'assets/images/heart.png');
         this.load.audio('shoot', 'assets/sounds/shoot.mp3');
         this.load.audio('heal', 'assets/sounds/heal.mp3');
@@ -18,6 +21,6 @@ class Boot extends Phaser.Scene {
         for (let i = 2; i <= comboSounds; i++) {
             this.load.audio(`combo-${i}`, `assets/sounds/kill-${i}.mp3`);
         }
-        this.load.on(`complete`, () => { this.scene.start(`play`); });
+        this.load.on(`complete`, () => { this.scene.start(`level1`); });
     }
 }

@@ -13,9 +13,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     userShoot(scene) {
         if (this.hp > 1) {
             scene.sound.add('shoot').play({ volume: 1 });
-            let bullet = new Bullet(scene, this.x, this.y, `bullet`)
+            let bullet = new Bullet(scene, this.x, this.y, bulletTypes[infernoStage])
                 .setVelocity(this.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, this.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
-                .setTint(0x00ff00)
+                // .setTint(0x00ff00)
                 .setMass(10);
             bullet.angle = this.body.rotation + 90;
             scene.bulletsPlayer.add(bullet);
@@ -38,31 +38,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         (this.hp < 100) && (this.hp = 100);
         scene.healing.remove(heal);
         scene.removeObj(heal);
-    }
-
-    /** move user using the arrow keys **/
-    userMovement(scene) {
-        const { left, right, up, down } = scene.cursors;
-        let keyboard = scene.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });
-        const cam = scene.cameras.main;
-        const body = this.body;
-        scene.ground.setTilePosition(cam.scrollX, cam.scrollY);
-        body.setAngularAcceleration(0);
-        scene.physics.velocityFromRotation(body.rotation, 0, body.acceleration);
-        // rotate if left/right arrow keys are down
-        let speedRatio = 3 - (Math.sqrt(Math.pow(this.body.velocity.x, 2) + Math.pow(this.body.velocity.y, 2)) / 1000) * 2;
-        if ((left.isDown || keyboard.left.isDown) && (!right.isDown && !keyboard.right.isDown)) {
-            body.setAngularVelocity(-75 * speedRatio);
-        } else if ((right.isDown || keyboard.right.isDown) && (!left.isDown && !keyboard.left.isDown)) {
-            body.setAngularVelocity(75 * speedRatio);
-        } else { // slow rotation when not pressing keys
-            body.setAngularAcceleration(0);
-            this.setAngularVelocity(body.angularVelocity / 1.05);
-        } // move forward/backward with up/down
-        ((!up.isDown || !keyboard.up.isDown) && (!down.isDown || !keyboard.down.isDown)) && scene.physics.velocityFromRotation(this.rotation, 1500, body.acceleration);
-        ((up.isDown || keyboard.up.isDown) && (!down.isDown && !keyboard.down.isDown)) && scene.physics.velocityFromRotation(this.rotation, 3000, body.acceleration);
-        ((down.isDown || keyboard.down.isDown) && (!up.isDown && !keyboard.up.isDown)) && scene.physics.velocityFromRotation(this.rotation, 750, body.acceleration);
-        this.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
     }
 
     /** hurts and kills the user depending on their health*/
