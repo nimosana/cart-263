@@ -12,6 +12,10 @@ class Scores {
             .setAlign('center')
             .setOrigin(0.5, 0)
             .setAlpha(0);
+        scene.stageText = scene.add.text(0, 0, 'Stage', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
+            .setAlign('center')
+            .setOrigin(0.5, 0.5)
+            .setAlpha(0);
     }
 
     /** displays scores and combos keeping track of them */
@@ -34,6 +38,9 @@ class Scores {
             scene.saidWow = false;
             scene.comboTimer = scene.comboNumber = 0;
         }
+        scene.stageText.setText(scene.stageName)
+            .setPosition(cam.scrollX + scene.scale.width * 0.8, cam.scrollY + scene.scale.height * 0.05)
+            .setAlpha(1);
         scene.murderText.setText(['MURDER COMBO: ' + scene.killCombo])
             .setPosition(cam.scrollX + scene.scale.width / 2, cam.scrollY + scene.scale.height / 3)
             .setAlpha(scene.murderText.alpha - 0.01);

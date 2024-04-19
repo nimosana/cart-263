@@ -38,35 +38,35 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     // }
 
     /** makes enemies fire bullets */
-    fireEnemyBullet(scene) {
-        let soundDist = (((Phaser.Math.Clamp(Phaser.Math.Distance.Between(scene.user.x, scene.user.y, this.x, this.y) / 700, 0, 1)) - 1) * -1);
-        scene.sound.add('shoot').play({ volume: soundDist });
-        let bullet = new Bullet(scene, this.x, this.y, bulletTypes[infernoStage])
-            .setVelocity(scene.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, scene.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
-        // .setTint(0xff0000);
-        bullet.body.setMass(200);
-        bullet.angle = this.body.rotation + 90;
-        scene.bulletsEnemies.add(bullet);
-    }
+    // fireEnemyBullet(scene) {
+    //     let soundDist = (((Phaser.Math.Clamp(Phaser.Math.Distance.Between(scene.user.x, scene.user.y, this.x, this.y) / 700, 0, 1)) - 1) * -1);
+    //     scene.sound.add('shoot').play({ volume: soundDist });
+    //     let bullet = new Bullet(scene, this.x, this.y, bulletTypes[infernoStage])
+    //         .setVelocity(scene.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, scene.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
+    //     // .setTint(0xff0000);
+    //     bullet.body.setMass(200);
+    //     bullet.angle = this.body.rotation + 90;
+    //     scene.bulletsEnemies.add(bullet);
+    // }
 
-    enemyHit(scene, bullet) {
-        this.hp -= 50;
-        scene.bulletsPlayer.remove(bullet);
-        scene.removeObj(bullet);
-        if (this.hp < 1) {
-            let soundDist = Phaser.Math.Distance.Between(scene.user.x, scene.user.y, this.x, this.y);
-            soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
-            scene.sound.add('scream').play({ volume: soundDist });
-            scene.murderText.setAlpha(1);
-            scene.killCombo++;
-            scene.kills++;
-            scene.comboNumber++;
-            scene.score += scene.killCombo;
-            scene.killTimer = 0;
-            (Phaser.Math.Between(0, 100) < 50) && scene.healing.add(scene.physics.add.sprite(this.x, this.y, "heart"));
-            scene.newCombo = true;
-            scene.enemies.remove(this);
-            scene.removeObj(this);
-        }
-    }
+    // enemyHit(scene, bullet) {
+    //     this.hp -= 50;
+    //     scene.bulletsPlayer.remove(bullet);
+    //     scene.removeObj(bullet);
+    //     if (this.hp < 1) {
+    //         let soundDist = Phaser.Math.Distance.Between(scene.user.x, scene.user.y, this.x, this.y);
+    //         soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
+    //         scene.sound.add('scream').play({ volume: soundDist });
+    //         scene.murderText.setAlpha(1);
+    //         scene.killCombo++;
+    //         scene.kills++;
+    //         scene.comboNumber++;
+    //         scene.score += scene.killCombo;
+    //         scene.killTimer = 0;
+    //         (Phaser.Math.Between(0, 100) < 50) && scene.healing.add(scene.physics.add.sprite(this.x, this.y, "heart"));
+    //         scene.newCombo = true;
+    //         scene.enemies.remove(this);
+    //         scene.removeObj(this);
+    //     }
+    // }
 }

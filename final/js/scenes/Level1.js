@@ -12,6 +12,7 @@ class Level1 extends Phaser.Scene {
         this.gameLost = false;
         this.myVoice = new p5.Speech();
         this.seaBlood = 0;
+        this.stageName = 'Limbo';
     }
 
     /** Creates the initial scene and elements for the war game */
@@ -31,12 +32,12 @@ class Level1 extends Phaser.Scene {
         this.cameras.main.startFollow(this.user);
         this.physics.add.collider(this.enemies, this.bulletsPlayer, this.bulletHitEnemyCollider, null, this);
         this.physics.add.collider(this.bulletsEnemies, this.user, this.bulletHitUserCollider, null, this);
-        this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
+        this.physics.add.overlap(this.healing, this.user, this.pickHeart, null, this);
         // add and set text objects
         Scores.initText(this);
         this.myVoice.speak("Watch out! Enemy close");
         // Add event listener for shooting while space is pressed down
-        this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.user.userShoot(this); }, 200); });
+        this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
         this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
         this.levelTexturer();
     }
@@ -59,8 +60,8 @@ class Level1 extends Phaser.Scene {
                 this.resetPlayScene();
             } else {
                 this.resetPlayScene();
+                this.scene.start('level2');
                 infernoStage++;
-                this.scene.start('level2')
             }
         }
     }
@@ -74,10 +75,10 @@ class Level1 extends Phaser.Scene {
     }
 
     /** removes bullet and hurts/kills enemies when colliding with a user bullet */
-    bulletHitEnemyCollider = (bullet, enemy) => { enemy.enemyHit(this, bullet); }
+    bulletHitEnemyCollider = (bullet, enemy) => { this.enemyHit(enemy, bullet); }
 
     /** removes bullet and hurts/kills user when colliding with a enemy bullet */
-    bulletHitUserCollider = (bullet, user) => { user.bulletHit(this, bullet); }
+    bulletHitUserCollider = (bullet, user) => { this.bulletHit(bullet); }
 
     /** heals the player when picking up a heart */
     userHealCollider = (heal, user) => { this.user.heal(this, heal); }
@@ -124,7 +125,7 @@ class Level1 extends Phaser.Scene {
 
     /** moves an enemy, targeting the user, and shooting at random */
     enemyMove(enemy) {
-        (Phaser.Math.Between(0, 500) < 1) && enemy.fireEnemyBullet(this);
+        (Phaser.Math.Between(0, 500) < 1) && this.fireEnemyBullet(enemy);
         let angleToTarget = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.user.x, this.user.y);
         let rotationDelta = Phaser.Math.Angle.RotateTo(enemy.rotation, angleToTarget, 0.03);
         enemy.setRotation(rotationDelta);
@@ -148,6 +149,70 @@ class Level1 extends Phaser.Scene {
             let randomizer = Phaser.Math.Between(-1000, 1000);
             this.enemies.add(new Enemy(this, this.user.x + Math.sign(randomizer) * this.scale.width / 2, this.user.y + Math.sign(randomizer) * this.scale.height / 2, `user-1`)
                 .setTint(`0xFF8800`));
+        }
+    }
+
+    pickHeart(heal) {
+        this.user.hp = 100;
+        this.sound.add('heal').play({ volume: 1 });
+        this.healing.remove(heal);
+        this.removeObj(heal);
+    }
+
+    /** makes the user shoot bullets in the direction they're going */
+    userShoot() {
+        if (this.user.hp > 1) {
+            let bullet = new Bullet(this, this.user.x, this.user.y, bulletTypes[infernoStage])
+                .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.user.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.user.angle)) * 800)
+                .setMass(10);
+            bullet.angle = this.user.body.rotation + 90;
+            this.bulletsPlayer.add(bullet);
+        }
+    }
+
+    fireEnemyBullet(enemy) {
+        let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
+            .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800)
+        // .setTint(0xff0000);
+        bullet.body.setMass(200);
+        bullet.angle = enemy.body.rotation + 90;
+        this.bulletsEnemies.add(bullet);
+    }
+
+    enemyHit(enemy, bullet) {
+        enemy.hp -= 50;
+        this.bulletsPlayer.remove(bullet);
+        this.removeObj(bullet);
+        let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
+        soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
+        this.sound.add('rockSound').play({ volume: soundDist });
+        if (enemy.hp < 1) {
+            this.sound.add('scream').play({ volume: soundDist });
+            this.murderText.setAlpha(1);
+            this.killCombo++;
+            this.kills++;
+            this.comboNumber++;
+            this.score += this.killCombo;
+            this.killTimer = 0;
+            (Phaser.Math.Between(0, 100) < 50) && this.healing.add(this.physics.add.sprite(enemy.x, enemy.y, "heart"));
+            this.newCombo = true;
+            this.enemies.remove(enemy);
+            this.removeObj(enemy);
+        }
+    }
+
+    /** hurts and kills the user depending on their health*/
+    bulletHit(bullet) {
+        this.user.hp -= 10;
+        this.bulletsEnemies.remove(bullet);
+        this.removeObj(bullet);
+        this.sound.add('rockSound').play({ volume: 1 });
+        if (this.user.hp < 1) {
+            this.myVoice.speak(`Thank you for your service`);
+            this.gameLost = true;
+            this.diedText.setAlpha(1);
+            this.sound.add('scream').play({ volume: 1 });
+            this.removeObj(this.user);
         }
     }
 

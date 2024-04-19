@@ -9,23 +9,23 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.hp = 100;
     }
 
-    /** makes the user shoot bullets in the direction they're going */
-    userShoot(scene) {
-        if (this.hp > 1) {
-            scene.sound.add('shoot').play({ volume: 1 });
-            let bullet = new Bullet(scene, this.x, this.y, bulletTypes[infernoStage])
-                .setVelocity(this.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, this.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
-                // .setTint(0x00ff00)
-                .setMass(10);
-            bullet.angle = this.body.rotation + 90;
-            scene.bulletsPlayer.add(bullet);
-        }
-    }
+    // /** makes the user shoot bullets in the direction they're going */
+    // userShoot(scene) {
+    //     if (this.hp > 1) {
+    //         scene.sound.add('shoot').play({ volume: 1 });
+    //         let bullet = new Bullet(scene, this.x, this.y, bulletTypes[infernoStage])
+    //             .setVelocity(this.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.angle)) * 800, this.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.angle)) * 800)
+    //             // .setTint(0x00ff00)
+    //             .setMass(10);
+    //         bullet.angle = this.body.rotation + 90;
+    //         scene.bulletsPlayer.add(bullet);
+    //     }
+    // }
 
     /** displays the user's health bar */
     healthBar(scene) {
         let width = Phaser.Math.Clamp((this.hp / 100) * 50, 0, 50);
-        scene.rect.setPosition(scene.cameras.main.scrollX + scene.scale.width / 2 - scene.rect.width / 2, scene.scale.height / 2 + scene.cameras.main.scrollY + 20);
+        scene.rect.setPosition(scene.cameras.main.scrollX + scene.scale.width / 2 - scene.rect.width / 2, scene.scale.height / 2 + scene.cameras.main.scrollY + 40);
         scene.rect.width = width;
         scene.graphics.clear()
             .fillStyle(0x00ff00, 1)
@@ -40,19 +40,19 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         scene.removeObj(heal);
     }
 
-    /** hurts and kills the user depending on their health*/
-    bulletHit(scene, bullet) {
-        this.hp -= 10;
-        scene.bulletsEnemies.remove(bullet);
-        scene.removeObj(bullet);
-        if (this.hp < 1) {
-            scene.myVoice.speak(`Thank you for your service`);
-            scene.gameLost = true;
-            scene.diedText.setAlpha(1);
-            scene.sound.add('scream').play({ volume: 1 });
-            scene.removeObj(this);
-        }
-    }
+    // /** hurts and kills the user depending on their health*/
+    // bulletHit(scene, bullet) {
+    //     this.hp -= 10;
+    //     scene.bulletsEnemies.remove(bullet);
+    //     scene.removeObj(bullet);
+    //     if (this.hp < 1) {
+    //         scene.myVoice.speak(`Thank you for your service`);
+    //         scene.gameLost = true;
+    //         scene.diedText.setAlpha(1);
+    //         scene.sound.add('scream').play({ volume: 1 });
+    //         scene.removeObj(this);
+    //     }
+    // }
 
     /** randomly rotates and makes the boat move */
     static moveBoat(scene) {
