@@ -10,7 +10,6 @@ class Level1 extends Phaser.Scene {
         this.firstSpawn = true;
         this.saidWow = false;
         this.gameLost = false;
-        this.myVoice = new p5.Speech();
         this.seaBlood = 0;
         this.stageName = 'Limbo';
     }
@@ -35,7 +34,7 @@ class Level1 extends Phaser.Scene {
         this.physics.add.overlap(this.healing, this.user, this.pickHeart, null, this);
         // add and set text objects
         Scores.initText(this);
-        this.myVoice.speak("Watch out! Enemy close");
+        myVoice.speak("The first circle of hell is depicted in Dante Alighieri's 14th-century poem Inferno, the first part of the Divine Comedy. Inferno tells the story of Dante's journey through a vision of hell ordered into nine circles corresponding to classifications of sin. The first circle is Limbo, the space reserved for those souls who died before baptism and for those who hail from non-Christian cultures. They live eternally in a castle set on a verdant landscape, but forever removed from heaven.");
         // Add event listener for shooting while space is pressed down
         this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
         this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
@@ -51,7 +50,7 @@ class Level1 extends Phaser.Scene {
         this.bulletsEnemies.children.each(bullet => { this.removeBullets(bullet, this.bulletsEnemies) });
         this.enemies.children.each(enemy => { this.enemyMove(enemy); });
         this.spawnEnemies(this);
-        Scores.textAndCombos(this, this.cameras.main);
+        this.textAndCombos(this.cameras.main);
         this.user.healthBar(this);
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
@@ -59,7 +58,6 @@ class Level1 extends Phaser.Scene {
             if (this.score < 255) {
                 this.resetPlayScene();
             } else {
-                this.resetPlayScene();
                 this.scene.start('level2');
                 infernoStage++;
             }
@@ -154,7 +152,7 @@ class Level1 extends Phaser.Scene {
 
     pickHeart(heal) {
         this.user.hp = 100;
-        this.sound.add('heal').play({ volume: 1 });
+        this.sound.add('heal').play({ volume: 0.5 });
         this.healing.remove(heal);
         this.removeObj(heal);
     }
@@ -184,7 +182,7 @@ class Level1 extends Phaser.Scene {
         this.bulletsPlayer.remove(bullet);
         this.removeObj(bullet);
         let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
-        soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
+        soundDist = (((Phaser.Math.Clamp(soundDist / 1000, 0, 1)) - 1) * -1);
         this.sound.add('rockSound').play({ volume: soundDist });
         if (enemy.hp < 1) {
             this.sound.add('scream').play({ volume: soundDist });
@@ -208,7 +206,6 @@ class Level1 extends Phaser.Scene {
         this.removeObj(bullet);
         this.sound.add('rockSound').play({ volume: 1 });
         if (this.user.hp < 1) {
-            this.myVoice.speak(`Thank you for your service`);
             this.gameLost = true;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
@@ -239,5 +236,36 @@ class Level1 extends Phaser.Scene {
 
         // Restart scene
         this.scene.restart();
+    }
+
+    /** displays scores and combos keeping track of them */
+    textAndCombos(cam) {
+        this.killTimer++;
+        this.comboTimer++;
+        (this.killTimer > 250) && (this.killCombo = 0);
+        if (this.comboTimer < 250) {
+            if (this.comboNumber >= 2 && this.newCombo) {
+                this.newCombo = false;
+                this.comboTimer = 0;
+                // if (this.comboNumber < 11) {
+                //     // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
+                // } else if (this.comboNumber >= 11 && !this.saidWow) {
+                //     this.saidWow = true;
+                //     // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
+                // }
+            }
+        } else {
+            this.saidWow = false;
+            this.comboTimer = this.comboNumber = 0;
+        }
+        this.stageText.setText(this.stageName)
+            .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
+            .setAlpha(1);
+        // this.murderText.setText(['MURDER COMBO: ' + this.killCombo])
+        //     .setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 3)
+        //     .setAlpha(this.murderText.alpha - 0.01);
+        this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
+        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
+            .setPosition(cam.scrollX + 50, cam.scrollY + 500);
     }
 }

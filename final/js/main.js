@@ -9,6 +9,7 @@
 "use strict";
 setInterval(moveBackground, 50);
 let backgroundPos = 0;
+let myVoice = new p5.Speech();
 
 let config = {
     type: Phaser.AUTO,
@@ -21,7 +22,8 @@ let config = {
     },
     scene: [Boot, Level1, Level2, Level7]
 };
-
+myVoice.setPitch(0.1);
+myVoice.setVoice(`Google UK English Male`);
 let game = new Phaser.Game(config);
 let infernoStage = 1;
 let bulletTypes = ['nothin', 'rock', `heart`, `bullet`];

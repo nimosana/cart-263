@@ -10,7 +10,6 @@ class Level7 extends Phaser.Scene {
         this.firstSpawn = true;
         this.saidWow = false;
         this.gameLost = false;
-        this.myVoice = new p5.Speech();
         this.seaBlood = 0;
         this.stageName = 'Violence';
         this.bloodTint = (`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1));
@@ -37,7 +36,7 @@ class Level7 extends Phaser.Scene {
         this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
         // add and set text objects
         Scores.initText(this);
-        this.myVoice.speak("Watch out! Enemy close");
+        myVoice.speak("The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.");
         // Add event listener for shooting while space is pressed down
         this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
         this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
@@ -55,7 +54,7 @@ class Level7 extends Phaser.Scene {
         this.enemies.children.each(enemy => { this.enemyMove(enemy); });
         Player.moveBoat(this);
         this.spawnEnemies();
-        Scores.textAndCombos(this, this.cameras.main);
+        this.textAndCombos(this.cameras.main);
         this.user.healthBar(this);
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
@@ -191,16 +190,47 @@ class Level7 extends Phaser.Scene {
 
     /** hurts and kills the user depending on their health*/
     bulletHit(bullet, user) {
-        this.hp -= 10;
+        this.user.hp -= 10;
         this.bulletsEnemies.remove(bullet);
         this.removeObj(bullet);
-        if (this.hp < 1) {
-            this.myVoice.speak(`Thank you for your service`);
+        if (this.user.hp < 1) {
+            myVoice.speak(`Thank you for your service`);
             this.gameLost = true;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
             this.removeObj(user);
         }
+    }
+
+    /** displays scores and combos keeping track of them */
+    textAndCombos(cam) {
+        this.killTimer++;
+        this.comboTimer++;
+        (this.killTimer > 250) && (this.killCombo = 0);
+        if (this.comboTimer < 250) {
+            if (this.comboNumber >= 2 && this.newCombo) {
+                this.newCombo = false;
+                this.comboTimer = 0;
+                if (this.comboNumber < 11) {
+                    // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
+                } else if (this.comboNumber >= 11 && !this.saidWow) {
+                    this.saidWow = true;
+                    // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
+                }
+            }
+        } else {
+            this.saidWow = false;
+            this.comboTimer = this.comboNumber = 0;
+        }
+        this.stageText.setText(this.stageName)
+            .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
+            .setAlpha(1);
+        this.murderText.setText(['MURDER COMBO: ' + this.killCombo])
+            .setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 3)
+            .setAlpha(this.murderText.alpha - 0.01);
+        this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
+        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
+            .setPosition(cam.scrollX + 50, cam.scrollY + 500);
     }
 
     resetPlayScene() {
