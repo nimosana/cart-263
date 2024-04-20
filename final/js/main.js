@@ -26,7 +26,7 @@ myVoice.setPitch(0.1);
 myVoice.setVoice(`Google UK English Male`);
 let game = new Phaser.Game(config);
 let infernoStage = 1;
-let bulletTypes = ['nothin', 'rock', `heart`, `bullet`];
+let bulletTypes = ['nothin', 'rock', `heart`, 'nothin', 'nothin', `bullet`];
 
 /** move the background of the html site */
 function moveBackground() {

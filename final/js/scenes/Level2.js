@@ -166,6 +166,11 @@ class Level2 extends Phaser.Scene {
         this.bulletsPlayer.remove(bullet);
         this.removeObj(bullet);
         if (enemy.hp < 1) {
+            this.killCombo++;
+            this.kills++;
+            this.comboNumber++;
+            this.score += this.killCombo;
+            this.killTimer = 0;
             let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
             soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
             this.murderText.setAlpha(1);
