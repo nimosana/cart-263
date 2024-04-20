@@ -32,7 +32,7 @@ class Level2 extends Phaser.Scene {
         this.cameras.main.startFollow(this.user);
         this.physics.add.collider(this.enemies, this.bulletsPlayer, this.bulletHitEnemyCollider, null, this);
         this.physics.add.collider(this.bulletsEnemies, this.user, this.bulletHitUserCollider, null, this);
-        this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
+        this.physics.add.overlap(this.healing, this.user, this.userHeartCollider, null, this);
         // add and set text objects
         Scores.initText(this);
         myVoice.speak("The second circle of hell represents the sin of lust. Dante and his companion Virgil find people who were overcome by lust, where the they are punished by being buffeted within an endless tempest, preventing them from finding peace and rest.");
@@ -56,7 +56,7 @@ class Level2 extends Phaser.Scene {
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
             infernoStage++;
-            this.scene.start('level7');
+            this.scene.start('level3');
         }
     }
 
@@ -67,7 +67,7 @@ class Level2 extends Phaser.Scene {
     bulletHitUserCollider = (bullet, user) => { this.bulletHit(bullet); }
 
     /** heals the player when picking up a heart */
-    userHealCollider = (heal, user) => { this.pickHeart(heal); }
+    userHeartCollider = (heal, user) => { this.pickHeart(heal); }
 
     /** removes an object from the physics engine */
     removeObj(obj) {
@@ -131,7 +131,6 @@ class Level2 extends Phaser.Scene {
             this.user.setAngularVelocity(body.angularVelocity / 1.05);
         } // move forward/backward with up/down
         body.setAngularAcceleration(body.angularAcceleration / 2);
-        // ((!up.isDown || !keyboard.up.isDown) && (!down.isDown || !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 1500, body.acceleration);
         ((up.isDown || keyboard.up.isDown) && (!down.isDown && !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 300, body.acceleration);
         ((down.isDown || keyboard.down.isDown) && (!up.isDown && !keyboard.up.isDown)) && this.physics.velocityFromRotation(this.user.rotation, -600, body.acceleration);
         this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
@@ -145,43 +144,10 @@ class Level2 extends Phaser.Scene {
         this.bulletsEnemies.add(bullet);
     }
 
-    resetPlayScene() {
-        // Remove all bullets and enemies
-        this.bulletsPlayer.clear(true, true);
-        this.bulletsEnemies.clear(true, true);
-        this.enemies.clear(true, true);
-
-        // Clear any active timers or intervals
-        clearInterval(this.shootInterval);
-        clearTimeout(this.killTimer);
-        clearInterval(this.comboTimer);
-
-        // Reset scene-specific variables
-        this.score = 0;
-        this.kills = 0;
-        this.killCombo = 0;
-        this.comboNumber = 0;
-        this.newCombo = true;
-        this.firstSpawn = true;
-        this.saidWow = false;
-        this.gameLost = false;
-
-        // Restart scene
-        this.scene.restart();
-    }
-
     /** hurts and kills the user depending on their health*/
     bulletHit(bullet) {
-        // this.hp -= 10;
         this.bulletsEnemies.remove(bullet);
         this.removeObj(bullet);
-        if (this.hp < 1) {
-            // myVoice.speak(`Thank you for your service`);
-            this.gameLost = true;
-            this.diedText.setAlpha(1);
-            this.sound.add('scream').play({ volume: 1 });
-            this.removeObj(this);
-        }
     }
 
     /** makes the user shoot bullets in the direction they're going */
@@ -202,15 +168,8 @@ class Level2 extends Phaser.Scene {
         if (enemy.hp < 1) {
             let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
             soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
-            // this.sound.add('scream').play({ volume: soundDist });
             this.murderText.setAlpha(1);
-            this.killCombo++;
-            this.kills++;
-            this.comboNumber++;
-            this.score += this.killCombo;
-            this.killTimer = 0;
             (Phaser.Math.Between(0, 100) < 50) && this.healing.add(this.physics.add.sprite(enemy.x, enemy.y, "heart"));
-            this.newCombo = true;
             this.enemies.remove(enemy);
             this.removeObj(enemy);
         }
@@ -218,33 +177,13 @@ class Level2 extends Phaser.Scene {
 
     /** displays scores and combos keeping track of them */
     textAndCombos(cam) {
-        this.killTimer++;
-        this.comboTimer++;
-        (this.killTimer > 250) && (this.killCombo = 0);
-        if (this.comboTimer < 250) {
-            if (this.comboNumber >= 2 && this.newCombo) {
-                this.newCombo = false;
-                this.comboTimer = 0;
-                // if (this.comboNumber < 11) {
-                //     // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
-                // } else if (this.comboNumber >= 11 && !this.saidWow) {
-                //     this.saidWow = true;
-                //     // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
-                // }
-            }
-        } else {
-            this.saidWow = false;
-            this.comboTimer = this.comboNumber = 0;
-        }
         this.stageText.setText(this.stageName)
             .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
             .setAlpha(1);
-        // this.murderText.setText(['MURDER COMBO: ' + this.killCombo])
-        //     .setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 3)
-        //     .setAlpha(this.murderText.alpha - 0.01);
         this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
         this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
-            .setPosition(cam.scrollX + 50, cam.scrollY + 500);
+            .setPosition(cam.scrollX + 50, cam.scrollY + 500)
+            .setAlpha(0);
     }
 
     pickHeart(heal) {

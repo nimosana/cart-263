@@ -212,10 +212,10 @@ class Level7 extends Phaser.Scene {
                 this.newCombo = false;
                 this.comboTimer = 0;
                 if (this.comboNumber < 11) {
-                    // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
+                    this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
                 } else if (this.comboNumber >= 11 && !this.saidWow) {
                     this.saidWow = true;
-                    // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
+                    this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
                 }
             }
         } else {
