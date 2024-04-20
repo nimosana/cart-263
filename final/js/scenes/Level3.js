@@ -83,7 +83,7 @@ class Level3 extends Phaser.Scene {
     /** displays scores and combos keeping track of them */
     textAndCombos(cam) {
         this.stageText.setText(this.stageName)
-            .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
+            .setPosition(cam.scrollX + this.scale.width * 0.7, cam.scrollY + this.scale.height * 0.05)
             .setAlpha(1);
         this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
         this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])

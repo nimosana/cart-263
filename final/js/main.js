@@ -20,13 +20,12 @@ let config = {
             gravity: { y: 0 }
         }
     },
-    scene: [Boot, Level1, Level2, Level3, Level4, Level7]
+    scene: [Boot, Level1, Level2, Level3, Level4, Level5, Level7]
 };
 myVoice.setPitch(0.1);
-myVoice.setVoice(`Google UK English Male`);
 let game = new Phaser.Game(config);
 let infernoStage = 1;
-let bulletTypes = ['nothin', 'rock', `heart`, 'nothin', 'nothin', `bullet`];
+let bulletTypes = ['nothin', 'rock', `heart`, 'nothin', 'nothin', `bullet`, `bullet`, `bullet`];
 
 /** move the background of the html site */
 function moveBackground() {

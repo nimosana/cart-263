@@ -1,217 +1,175 @@
 /** Creates the scene for the war game and every element it contains, run after Boot */
 class Level7 extends Phaser.Scene {
-
     /** allows the creation of a scene for the war game, initializing it with required params */
     constructor() {
-        super({ key: `level7` });
-        this.score = this.killTimer = this.kills = this.killCombo = 0;
-        this.comboNumber = this.comboTimer = 0;
-        this.newCombo = true;
+        super({
+            key: `level7`
+        });
+        this.userXAcc = this.userYAcc = this.userXSpd = this.userYSpd = 0;
+        this.score = 0;
+        this.kills = 0;
+        this.killTimer = 0;
+        this.killCombo = 0;
         this.firstSpawn = true;
+        this.comboTimer = 0;
+        this.comboNumber = 0;
+        this.newCombo = true;
         this.saidWow = false;
         this.gameLost = false;
-        this.seaBlood = 0;
-        this.stageName = 'Violence';
-        this.bloodTint = (`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1));
+        this.stageName = `Violence`
     }
 
     /** Creates the initial scene and elements for the war game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.physics.world.setBounds(0, 0, 1000, 1000); // create world
-        this.ground = this.add.tileSprite(0, 0, 1800, 1800, 'sea').setScrollFactor(0, 0);
-        // create and setup groups, objects, physics, camera
+        // create world
+        this.physics.world.setBounds(0, 0, 1000, 1000);
+        this.ground = this.add.tileSprite(0, 0, 2000, 2000, 'grass').setScrollFactor(0, 0);
+        // create and setup user
+        this.user = this.physics.add.sprite(0, 0, 'user-5')
+            .setMass(30)
+            .setBounce(1, 1)
+            .setMaxVelocity(100);
+        this.user.body.angularDrag = 120;
+        this.userHp = 100;
+        this.cameras.main.startFollow(this.user);
+        myVoice.speak("The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.");
         this.bulletsPlayer = this.add.group();
         this.bulletsEnemies = this.add.group();
         this.healing = this.add.group();
-        this.enemies = this.physics.add.group();
-        this.boat = this.physics.add.sprite(0, 0, `boat`);
-        this.user = new Player(this, 0, 0, 'user');
-        Player.initHealthBar(this);
-        this.user.body.angularDrag = 120;
-        this.cameras.main.startFollow(this.user);
-        this.physics.add.collider(this.enemies, this.bulletsPlayer, this.bulletHitEnemyCollider, null, this);
-        this.physics.add.collider(this.bulletsEnemies, this.user, this.bulletHitUserCollider, null, this);
-        this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
-        // add and set text objects
-        Scores.initText(this);
-        myVoice.speak("The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.");
-        // Add event listener for shooting while space is pressed down
-        this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
-        this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
-    }
-
-    /** Updates the scene/game */
-    update() {
-        console.log(`infstage ` + infernoStage)
-        this.seaBlood = Math.min(Math.max(this.score, 0), 255);
-        this.bloodTint = (`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1));
-        this.ground.setTint(this.bloodTint);
-        this.userMovement();
-        this.bulletsPlayer.children.each(bullet => { this.removeBullets(bullet, this.bulletsPlayer) });
-        this.bulletsEnemies.children.each(bullet => { this.removeBullets(bullet, this.bulletsEnemies) });
-        this.enemies.children.each(enemy => { this.enemyMove(enemy); });
-        Player.moveBoat(this);
-        this.spawnEnemies();
-        this.textAndCombos(this.cameras.main);
-        this.user.healthBar(this);
-        // Check enter keypress after loss / Reset the scene and physics
-        if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
-            // this.score = this.kills = 0;
-            if (this.score < 255) {
-                this.resetPlayScene();
-            } else {
-                this.resetPlayScene();
+        this.enemies = this.physics.add.group({
+            key: `enemy-5`,
+            quantity: 1,
+            bounceX: 1,
+            bounceY: 1,
+            x: -450,
+            y: -450,
+            dragX: 50,
+            dragY: 50,
+            mass: 50,
+            createCallback: function (enemy) {
+                enemy.hp = 100;
+                enemy.fireRate = 1000;
+                enemy.lastFire = 0;
             }
-        }
+        });
+
+        Phaser.Actions.RandomRectangle(this.enemies.getChildren(), this.physics.world.bounds);
+        this.physics.add.collider(this.user, this.enemies, this.tanksTouched, null, this);
+        this.physics.add.collider(this.enemies, this.enemies);
+        this.physics.add.collider(this.enemies, this.bulletsPlayer, this.bulletHitEnemy, null, this);
+        this.physics.add.collider(this.bulletsEnemies, this.user, this.bulletHitUser, null, this);
+        this.physics.add.overlap(this.healing, this.user, this.userHeal, null, this);
+        // add and set text objects
+        this.scoreText = this.add.text(0, 0, '', { fontSize: '32px', fontFamily: 'IMPACT', fill: '#ffffff' })
+            .setAlign('left')
+            .setOrigin(0, 7);
+        this.murderText = this.add.text(0, 0, '', { fontSize: '32px', fontFamily: 'IMPACT', fill: '#ffffff' })
+            .setAlign('center')
+            .setOrigin(0.5, 0)
+            .setAlpha(0);
+        this.diedText = this.add.text(0, 0, 'YOU DIED\nPress enter to restart', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
+            .setAlign('center')
+            .setOrigin(0.5, 0)
+            .setAlpha(0);
+        this.stageText = this.add.text(0, 0, 'Stage', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
+            .setAlign('center')
+            .setOrigin(0.5, 0.5)
+            .setAlpha(0);
+        //user shoot inputs
+        this.input.on('pointerdown', (pointer) => {
+            this.userShoot();
+        });
+        this.input.keyboard.on('keydown-SPACE', () => {
+            this.userShoot();
+        });
+        this.rect = new Phaser.Geom.Rectangle(100, 100, 200, 5);
+        this.graphics = this.add.graphics();
+        this.graphics.fillStyle(0x00ff00, 1);
     }
 
-    /** removes bullet and hurts/kills enemies when colliding with a user bullet */
-    bulletHitEnemyCollider = (bullet, enemy) => { this.enemyHit(bullet, enemy); }
-
-    /** removes bullet and hurts/kills user when colliding with a enemy bullet */
-    bulletHitUserCollider = (bullet, user) => { this.bulletHit(bullet, user); }
-
-    /** heals the player when picking up a heart */
-    userHealCollider = (heal, user) => { this.user.heal(this, heal); }
-
-    /** removes an object from the physics engine */
-    removeObj(obj) {
-        obj.body.destroy();
-        obj.setActive(false);
-        obj.setVisible(false);
-    }
-
-    /** removes bullets that are outside the viewable zone */
-    removeBullets(bullet, group) {
-        if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
-            group.remove(bullet);
-            this.removeObj(bullet);
-        }
-    }
-
-    spawnEnemies() {
-        if (this.enemies.getLength() < this.kills || this.firstSpawn) {
-            this.firstSpawn = false;
-            let randomizer = Phaser.Math.Between(-1000, 1000);
-            this.enemies.add(new Enemy(this, this.user.x + Math.sign(randomizer) * this.scale.width / 2, this.user.y + Math.sign(randomizer) * this.scale.height / 2, `user`)
-                .setTint(this.bloodTint));
-        }
-    }
-
-    /** moves an enemy, targeting the user, and shooting at random */
-    enemyMove(enemy) {
-        (Phaser.Math.Between(0, 500) < 1) && this.fireEnemyBullet(enemy);
-        let angleToTarget = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.user.x, this.user.y);
-        let rotationDelta = Phaser.Math.Angle.RotateTo(enemy.rotation, angleToTarget, 0.03);
-        enemy.setRotation(rotationDelta);
-        let speed = 3000;
-        //slow or accelerate movement depending on angle vs user
-        if (Math.abs(enemy.rotation - angleToTarget) > Math.PI / 2) {
-            speed = 750;
-        } else if (Math.abs(enemy.rotation - angleToTarget) > Math.PI / 4) {
-            speed = 1000;
-        }
-        if (Phaser.Math.Distance.Between(enemy.x, enemy.y, this.user.x, this.user.y) < this.scale.width / 4) {
-            speed = 1500;
-        }
-        this.physics.velocityFromRotation(enemy.rotation, speed, enemy.body.acceleration);
-        enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always
-    }
-
-    userMovement() {
-        const { left, right, up, down } = this.cursors;
-        let keyboard = this.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });
-        const cam = this.cameras.main;
-        const body = this.user.body;
-        this.ground.setTilePosition(cam.scrollX, cam.scrollY);
-        body.setAngularAcceleration(0);
-        this.physics.velocityFromRotation(body.rotation, 0, body.acceleration);
-        // rotate if left/right arrow keys are down
-        let speedRatio = 3 - (Math.sqrt(Math.pow(this.user.body.velocity.x, 2) + Math.pow(this.user.body.velocity.y, 2)) / 1000) * 2;
-        if ((left.isDown || keyboard.left.isDown) && (!right.isDown && !keyboard.right.isDown)) {
-            body.setAngularVelocity(-75 * speedRatio);
-        } else if ((right.isDown || keyboard.right.isDown) && (!left.isDown && !keyboard.left.isDown)) {
-            body.setAngularVelocity(75 * speedRatio);
-        } else { // slow rotation when not pressing keys
-            this.user.setAngularVelocity(body.angularVelocity / 1.05);
-        } // move forward/backward with up/down
-        body.setAngularAcceleration(body.angularAcceleration / 2);
-        ((!up.isDown || !keyboard.up.isDown) && (!down.isDown || !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 1500, body.acceleration);
-        ((up.isDown || keyboard.up.isDown) && (!down.isDown && !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 3000, body.acceleration);
-        ((down.isDown || keyboard.down.isDown) && (!up.isDown && !keyboard.up.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 750, body.acceleration);
-        this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
-    }
-
-    /** makes the user shoot bullets in the direction they're going */
+    /** makes the user shoot bullet */
     userShoot() {
-        if (this.user.hp > 1) {
+        if (this.userHp > 1) {
             this.sound.add('shoot').play({ volume: 1 });
-            let bullet = new Bullet(this, this.user.x, this.user.y, bulletTypes[infernoStage])
-                .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(this.user.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(this.user.angle)) * 800)
-                .setMass(10);
+            let bullet = this.physics.add.sprite(this.user.x, this.user.y, "bullet");
+            bullet.setVelocity(Math.cos(Phaser.Math.DegToRad(this.user.angle)) * 200, Math.sin(Phaser.Math.DegToRad(this.user.angle)) * 200);
+            bullet.setTint(0x00ff00);
             bullet.angle = this.user.body.rotation + 90;
             this.bulletsPlayer.add(bullet);
         }
     }
 
-    fireEnemyBullet(enemy) {
-        let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
-            .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800)
-        // .setTint(0xff0000);
-        let soundDist = (((Phaser.Math.Clamp(Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y) / 700, 0, 1)) - 1) * -1);
-        this.sound.add('shoot').play({ volume: soundDist });
-        bullet.body.setMass(200);
-        bullet.angle = enemy.body.rotation + 90;
-        this.bulletsEnemies.add(bullet);
+    /** displays the user's health bar */
+    healthBar() {
+        const width = Phaser.Math.Clamp((this.userHp / 100) * 50, 0, 50);
+        this.rect.setPosition(this.cameras.main.scrollX + this.scale.width / 2 - this.rect.width / 2, this.scale.height / 2 + this.cameras.main.scrollY + 20);
+        this.rect.width = width;
+        this.graphics.clear();
+        this.graphics.fillStyle(0x00ff00, 1);
+        this.graphics.fillRectShape(this.rect);
     }
 
-    enemyHit(bullet, enemy) {
-        enemy.hp -= 50;
-        this.bulletsPlayer.remove(bullet);
-        this.removeObj(bullet);
-        if (enemy.hp < 1) {
-            let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
-            soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
-            this.sound.add('scream').play({ volume: soundDist });
-            this.murderText.setAlpha(1);
-            this.killCombo++;
-            this.kills++;
-            this.comboNumber++;
-            this.score += this.killCombo;
-            this.killTimer = 0;
-            (Phaser.Math.Between(0, 100) < 50) && this.healing.add(this.physics.add.sprite(enemy.x, enemy.y, "heart"));
-            this.newCombo = true;
-            this.enemies.remove(enemy);
-            this.removeObj(enemy);
+    /** heals the player when picking up a heart */
+    userHeal(heal, user) {
+        this.sound.add('heal').play({ volume: 1 });
+        if (this.userHp < 100) {
+            this.userHp = 100;
+        }
+        this.healing.remove(heal);
+        this.removeObj(heal);
+    }
+
+    /** Updates the scene/game */
+    update() {
+        this.userMovement();
+        this.bulletShootDelete();
+        this.spawnEnemies();
+        this.textAndCombos(this.cameras.main);
+        this.healthBar();
+        // Check enter keypress after loss / Reset the scene and physics
+        if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
+            if (this.score < 500) {
+                this.score = this.kills = 0;
+                this.gameLost = false;
+                this.scene.restart();
+            } else {
+                infernoStage++;
+                // this.scene.start('level7');
+                this.scene.restart();
+            }
         }
     }
 
-    /** hurts and kills the user depending on their health*/
-    bulletHit(bullet, user) {
-        this.user.hp -= 10;
-        this.bulletsEnemies.remove(bullet);
-        this.removeObj(bullet);
-        if (this.user.hp < 1) {
-            myVoice.speak(`Thank you for your service`);
-            this.gameLost = true;
-            this.diedText.setAlpha(1);
-            this.sound.add('scream').play({ volume: 1 });
-            this.removeObj(user);
+    /** spawns an enemy in a random corner */
+    spawnEnemies() {
+        if (this.enemies.getLength() < this.kills || this.firstSpawn) {
+            this.firstSpawn = false;
+            let randomizer = Phaser.Math.Between(-1000, 1000);
+            let randomH, randomV;
+            randomH = this.user.x + Math.sign(randomizer) * this.scale.width / 2;
+            randomizer = Phaser.Math.Between(-1000, 1000);
+            randomV = this.user.y + Math.sign(randomizer) * this.scale.height / 2;
+
+            this.enemies.add(this.physics.add.sprite(randomH, randomV, 'enemy-5'));
+            console.log("spawned at" + randomH + ", " + randomV);
         }
     }
 
     /** displays scores and combos keeping track of them */
     textAndCombos(cam) {
         this.killTimer++;
+        if (this.killTimer > 250) {
+            this.killCombo = 0;
+        }
         this.comboTimer++;
-        (this.killTimer > 250) && (this.killCombo = 0);
         if (this.comboTimer < 250) {
             if (this.comboNumber >= 2 && this.newCombo) {
                 this.newCombo = false;
                 this.comboTimer = 0;
                 if (this.comboNumber < 11) {
+                    console.log(`playing combo-${this.comboNumber}`)
                     this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
                 } else if (this.comboNumber >= 11 && !this.saidWow) {
                     this.saidWow = true;
@@ -229,32 +187,137 @@ class Level7 extends Phaser.Scene {
             .setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 3)
             .setAlpha(this.murderText.alpha - 0.01);
         this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
-        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
-            .setPosition(cam.scrollX + 50, cam.scrollY + 500);
+        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`]);
+        this.scoreText.setPosition(cam.scrollX + 50, cam.scrollY + 500);
+
     }
 
-    resetPlayScene() {
-        // Remove all bullets and enemies
-        this.bulletsPlayer.clear(true, true);
-        this.bulletsEnemies.clear(true, true);
-        this.enemies.clear(true, true);
+    /** move user using the arrow keys **/
+    userMovement() {
+        const { left, right, up, down } = this.cursors;
+        const cam = this.cameras.main;
+        const body = this.user.body;
+        this.ground.setTilePosition(cam.scrollX, cam.scrollY);
+        body.setAngularAcceleration(0);
+        this.physics.velocityFromRotation(body.rotation, 0, body.acceleration);
+        // rotate if left/right arrow keys are down
+        if (left.isDown && !right.isDown) {
+            this.userXSpd++;
+            if (body.angularVelocity > -150) {
+                body.setAngularAcceleration(-150);
+            }
+        } else if (right.isDown && !left.isDown) {
+            this.userXSpd++;
+            if (body.angularVelocity < 150) {
+                body.setAngularAcceleration(150);
+            }
+        } else { // slow rotation when not pressing keys
+            body.setAngularAcceleration(0);
+            this.user.setAngularVelocity(body.angularVelocity / 1.05);
+        } // move forward/backward with up/down
+        up.isDown && this.physics.velocityFromRotation(this.user.rotation, 600, body.acceleration);
+        down.isDown && this.physics.velocityFromRotation(this.user.rotation, -300, body.acceleration);
+        this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
+    }
 
-        // Clear any active timers or intervals
-        clearInterval(this.shootInterval);
-        clearTimeout(this.killTimer);
-        clearInterval(this.comboTimer);
+    /** removes bullet and hurts/kills enemies when colliding with a user bullet */
+    bulletHitEnemy(bullet, enemy) {
+        enemy.hp -= 50;
+        this.bulletsPlayer.remove(bullet);
+        this.removeObj(bullet);
 
-        // Reset scene-specific variables
-        this.score = 0;
-        this.kills = 0;
-        this.killCombo = 0;
-        this.comboNumber = 0;
-        this.newCombo = true;
-        this.firstSpawn = true;
-        this.saidWow = false;
-        this.gameLost = false;
+        if (enemy.hp < 1) {
+            let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
+            soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
+            this.sound.add('scream').play({ volume: soundDist });
+            this.murderText.setAlpha(1);
+            this.killCombo++;
+            this.comboNumber++;
+            this.score += this.killCombo;
+            this.kills++;
+            this.killTimer = 0;
+            let random = Phaser.Math.Between(0, 100);
+            if (random < 50) {
+                let heal = this.physics.add.sprite(enemy.x, enemy.y, "heart");
+                this.healing.add(heal);
+            }
+            this.newCombo = true;
+            this.enemies.remove(enemy);
+            this.removeObj(enemy);
+        }
+    }
 
-        // Restart scene
-        this.scene.restart();
+    /** removes bullet and hurts/kills user when colliding with a enemy bullet */
+    bulletHitUser(bullet, user) {
+        this.userHp -= 10;
+        console.log(this.userHp)
+        this.bulletsEnemies.remove(bullet)
+        this.removeObj(bullet);
+
+        if (this.userHp < 1) {
+            this.gameLost = true;
+            this.diedText.setAlpha(1);
+            this.sound.add('scream').play({ volume: 1 });
+            this.removeObj(user);
+        }
+    }
+
+    /** removes bullets out of bounds, moves and makes enemies shoot at random */
+    bulletShootDelete() {
+        this.bulletsPlayer.children.each(bullet => {
+            if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
+                this.bulletsPlayer.remove(bullet);
+                this.removeObj(bullet);
+            }
+        });
+        this.bulletsEnemies.children.each(bullet => {
+            if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
+                this.bulletsEnemies.remove(bullet);
+                this.removeObj(bullet);
+            }
+        });
+        this.enemies.children.each(enemy => {
+            let random = Phaser.Math.Between(0, 500);
+            if (random < 1) {
+                let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
+                soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
+                this.sound.add('shoot').play({ volume: soundDist });
+                enemy.lastFire = 0;
+                let bullet = this.physics.add.sprite(enemy.x, enemy.y, "bullet");
+                bullet.setVelocity(Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 200, Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 200);
+                bullet.setTint(0xff0000);
+                bullet.body.setMass(1000);
+                bullet.angle = enemy.body.rotation + 90;
+                this.bulletsEnemies.add(bullet);
+            }
+            enemy.setRotation(Phaser.Math.Angle.Between(enemy.x, enemy.y, this.user.x, this.user.y));
+            this.physics.velocityFromRotation(enemy.rotation, 10, enemy.body.acceleration);
+        });
+    }
+
+    /** plays sound and hurts enemies when colliding with user */
+    tanksTouched(user, enemy) {
+        enemy.hp -= 50;
+        this.sound.add('impact').play({ volume: 1 });
+
+        if (enemy.hp < 1) {
+            this.murderText.setAlpha(1);
+            this.killCombo++;
+            this.comboNumber++;
+            this.score += this.killCombo;
+            this.kills++;
+            this.killTimer = 0;
+            this.sound.add('scream').play({ volume: 1 });
+            this.enemies.remove(enemy)
+            this.newCombo = true;
+            this.removeObj(enemy);
+        }
+    }
+
+    /** removes an object from the physics engine */
+    removeObj(obj) {
+        obj.body.destroy();
+        obj.setActive(false);
+        obj.setVisible(false);
     }
 }

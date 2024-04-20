@@ -13,8 +13,8 @@ class Scores {
             .setOrigin(0.5, 0)
             .setAlpha(0);
         scene.stageText = scene.add.text(0, 0, 'Stage', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
-            .setAlign('center')
-            .setOrigin(0.5, 0.5)
+            .setAlign('left')
+            .setOrigin(0, 0.5)
             .setAlpha(0);
     }
 

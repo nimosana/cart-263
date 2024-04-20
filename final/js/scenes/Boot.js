@@ -9,11 +9,14 @@ class Boot extends Phaser.Scene {
         this.load.image(`user`, `assets/images/plane2.png`);
         this.load.image(`user-1`, `assets/images/user-1.png`);
         this.load.image(`user-2`, `assets/images/user-2.png`);
+        this.load.image(`user-5`, `assets/images/tankPlayer.png`);
         this.load.image(`enemy`, `assets/images/plane1.png`);
         this.load.image(`enemy-2`, `assets/images/enemy-2.png`);
+        this.load.image(`enemy-5`, `assets/images/tankEnemy.png`);
         this.load.image(`boat`, `assets/images/boat3.png`);
         //backgrounds
         this.load.image('sea', `assets/images/sea.jpg`);
+        this.load.image('grass', `assets/images/grass.jpg`);
         this.load.image('sand', `assets/images/sand.png`);
         this.load.image('dirt', `assets/images/dirt.png`);
         this.load.image('hearts', 'assets/images/hearts.png');
