@@ -40,9 +40,7 @@ class Level3 extends Phaser.Scene {
     /** Updates the scene/game */
     update() {
         this.userMovement();
-        this.stageText.setText(this.stageName)
-            .setPosition(this.cameras.main.scrollX + this.scale.width * 0.7, this.cameras.main.scrollY + this.scale.height * 0.05)
-            .setAlpha(1);
+        this.textAndCombos(this.cameras.main);
         this.user.healthBar(this);
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
@@ -77,6 +75,17 @@ class Level3 extends Phaser.Scene {
         ((up.isDown || keyboard.up.isDown) && (!down.isDown && !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 500 - this.fatness, body.acceleration);
         ((down.isDown || keyboard.down.isDown) && (!up.isDown && !keyboard.up.isDown)) && this.physics.velocityFromRotation(this.user.rotation, -600, body.acceleration);
         this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
+    }
+
+    /** displays scores and combos keeping track of them */
+    textAndCombos(cam) {
+        this.stageText.setText(this.stageName)
+            .setPosition(cam.scrollX + this.scale.width * 0.7, cam.scrollY + this.scale.height * 0.05)
+            .setAlpha(1);
+        this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
+        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
+            .setPosition(cam.scrollX + 50, cam.scrollY + 500)
+            .setAlpha(0);
     }
 
     /** hurts the player when picking up a cookie */
