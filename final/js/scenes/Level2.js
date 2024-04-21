@@ -1,5 +1,6 @@
 /** Creates the scene for the 2nd circle, Lust.
  * The player must throw hearts towards loving crowds to avoid getting blown away by their love.
+ * Picking up hearts hurts the player, when they die, they go to the next circle.
  * Runnable after boot */
 class Level2 extends Phaser.Scene {
 
@@ -112,6 +113,7 @@ class Level2 extends Phaser.Scene {
         enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always
     }
 
+    /** moves the user using the arrow keys */
     userMovement() {
         const { left, right, up, down } = this.cursors;
         let keyboard = this.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });

@@ -40,6 +40,6 @@ class Boot extends Phaser.Scene {
         for (let i = 2; i <= comboSounds; i++) {
             this.load.audio(`combo-${i}`, `assets/sounds/kill-${i}.mp3`);
         }
-        this.load.on(`complete`, () => { this.scene.start(`level1`); });
+        this.load.on(`complete`, () => { this.scene.start(`level6`); });
     }
 }

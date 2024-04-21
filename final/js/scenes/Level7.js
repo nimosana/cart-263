@@ -1,6 +1,9 @@
-/** Creates the scene for the 7th circle, Violence. Runnable after boot */
+/** Creates the scene for the 7th circle, Violence.
+ * The player must murder its enemies.
+ * They are stuck here, and dying doesn't make anything better.
+ * Runnable after boot */
 class Level7 extends Phaser.Scene {
-    /** allows the creation of a scene for the war game, initializing it with required params */
+    /** allows the creation of a scene for the violence game, initializing it with required params */
     constructor() {
         super({
             key: `level7`
@@ -42,7 +45,7 @@ class Level7 extends Phaser.Scene {
         this.healing = this.add.group();
         this.enemies = this.physics.add.group({
             key: `enemy-5`,
-            quantity: 1,
+            quantity: 0,
             bounceX: 1,
             bounceY: 1,
             x: -450,
@@ -91,7 +94,7 @@ class Level7 extends Phaser.Scene {
         this.graphics.fillStyle(0x00ff00, 1);
     }
 
-    /** makes the user shoot bullet */
+    /** makes the user shoot bullets */
     userShoot() {
         if (this.userHp > 1) {
             this.sound.add('shoot').play({ volume: 1 });
@@ -137,6 +140,7 @@ class Level7 extends Phaser.Scene {
             this.score = 0;
             this.firstLoss = false;
             this.scene.restart();
+            //resets the game, keeping the number of kills/enemies
         }
     }
 

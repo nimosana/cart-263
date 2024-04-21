@@ -1,4 +1,7 @@
-/** Creates the scene for the war game and every element it contains, run after Boot */
+/** Creates the scene for the 3nd circle, Gluttony.
+ * The player must eat cookies until they die.
+ * When they die, they go to the next circle.
+ * Runnable after boot */
 class Level3 extends Phaser.Scene {
 
     /** allows the creation of a scene for the war game, initializing it with required params */
@@ -28,7 +31,7 @@ class Level3 extends Phaser.Scene {
         Player.initHealthBar(this);
         this.user.body.angularDrag = 120;
         this.cameras.main.startFollow(this.user);
-        this.physics.add.overlap(this.enemies, this.user, this.userHealCollider, null, this);
+        this.physics.add.overlap(this.enemies, this.user, this.userCookieCollider, null, this);
         // add and set text objects
         Scores.initText(this);
         myVoice.speak("When reaching the Third Circle of Hell, Dante and Virgil find souls of gluttons who are overlooked by a worm-monster Cerberus. Sinners in this circle of Hell are punished by being forced to lie in a vile slush that is produced by never-ending icy rain.");
@@ -46,8 +49,8 @@ class Level3 extends Phaser.Scene {
         }
     }
 
-    /** heals the player when picking up a heart */
-    userHealCollider = (cookie, user) => { this.pickHeart(user, cookie); }
+    /** hurts the player when picking up a cookie */
+    userCookieCollider = (cookie, user) => { this.pickCookie(user, cookie); }
 
     /** removes an object from the physics engine */
     removeObj(obj) {
@@ -56,6 +59,7 @@ class Level3 extends Phaser.Scene {
         obj.setVisible(false);
     }
 
+    /** moves the user using the arrow keys */
     userMovement() {
         const { left, right, up, down } = this.cursors;
         let keyboard = this.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });
@@ -91,7 +95,8 @@ class Level3 extends Phaser.Scene {
             .setAlpha(0);
     }
 
-    pickHeart(cookie, user) {
+    /** hurts the player when picking up a cookie */
+    pickCookie(cookie, user) {
         this.user.hp -= 10;
         this.fatness += 15;
         this.sound.add('eat').play({ volume: 0.5 });

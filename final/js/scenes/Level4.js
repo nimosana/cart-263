@@ -1,4 +1,7 @@
-/** Creates the scene for the war game and every element it contains, run after Boot */
+/** Creates the scene for the 4th circle, Greed.
+ * The player must collect money until they die.
+ * When they die, they go to the next circle.
+ * Runnable after boot */
 class Level4 extends Phaser.Scene {
 
     /** allows the creation of a scene for the war game, initializing it with required params */
@@ -49,7 +52,7 @@ class Level4 extends Phaser.Scene {
         }
     }
 
-    /** heals the player when picking up a heart */
+    /** hurts the player when picking up money */
     userMoneyCollider = (money, user) => { this.pickMoney(user, money); }
 
     /** removes an object from the physics engine */
@@ -59,6 +62,7 @@ class Level4 extends Phaser.Scene {
         obj.setVisible(false);
     }
 
+    /** moves the user using the arrow keys */
     userMovement() {
         const { left, right, up, down } = this.cursors;
         let keyboard = this.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });

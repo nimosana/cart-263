@@ -1,4 +1,7 @@
-/** Creates the scene for the war game and every element it contains, run after Boot */
+/** Creates the scene for the 5th circle, Wrath.
+ * The player must murder its enemies.
+ * If they score higher than 255, they go to the next circle.
+ * Runnable after boot */
 class Level5 extends Phaser.Scene {
 
     /** allows the creation of a scene for the war game, initializing it with required params */

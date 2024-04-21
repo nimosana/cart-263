@@ -1,5 +1,6 @@
 /** Creates the scene for the 1st circle, Limbo.
  * The player must throw bullets towards hostile crowds to avoid getting lapidated.
+ * If the player scores higher than 255, they will move into the next circle
  * Runnable after boot */
 class Level1 extends Phaser.Scene {
 
@@ -87,6 +88,7 @@ class Level1 extends Phaser.Scene {
         }
     }
 
+    /** moves the user using the arrow keys */
     userMovement() {
         const { left, right, up, down } = this.cursors;
         let keyboard = this.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });
@@ -151,7 +153,7 @@ class Level1 extends Phaser.Scene {
         this.removeObj(heal);
     }
 
-    /** makes the user shoot bullets in the direction they're going */
+    /** makes the user shoot rocks in the direction they're going */
     userShoot() {
         if (this.user.hp > 1) {
             let bullet = new Bullet(this, this.user.x, this.user.y, bulletTypes[infernoStage])
@@ -162,7 +164,7 @@ class Level1 extends Phaser.Scene {
         }
     }
 
-    /** Fires a bullet from an enemy towards the player. */
+    /** Fires a rock from an enemy towards the player. */
     fireEnemyBullet(enemy) {
         let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
             .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800)
@@ -172,7 +174,7 @@ class Level1 extends Phaser.Scene {
         this.bulletsEnemies.add(bullet);
     }
 
-    /** Updates enemy health, removes bullet, plays sounds, increments kills, and adds potential healing item on death. */
+    /** Updates enemy health, removes rock, plays sounds, increments kills, and adds potential healing item on death. */
     enemyHit(enemy, bullet) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
