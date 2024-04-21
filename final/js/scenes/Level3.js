@@ -7,9 +7,10 @@ class Level3 extends Phaser.Scene {
     /** allows the creation of a scene for the war game, initializing it with required params */
     constructor() {
         super({ key: `level3` });
-
+        this.imageVisibility = 0;
         this.gameLost = false;
         this.fatness = 0;
+        this.ratio;
         this.stageName = 'Gluttony';
     }
 
@@ -33,6 +34,10 @@ class Level3 extends Phaser.Scene {
         this.cameras.main.startFollow(this.user);
         this.physics.add.overlap(this.enemies, this.user, this.userCookieCollider, null, this);
         // add and set text objects
+        this.backgroundImage = this.add.image(0, 0, 'gluttony')
+            .setOrigin(0, 0);
+        this.ratio = (this.scale.height / this.backgroundImage.height);
+        this.backgroundImage.setScale(this.ratio * 1, this.ratio * 1);
         Scores.initText(this);
         myVoice.speak("When reaching the Third Circle of Hell, Dante and Virgil find souls of gluttons who are overlooked by a worm-monster Cerberus. Sinners in this circle of Hell are punished by being forced to lie in a vile slush that is produced by never-ending icy rain.");
     }
@@ -46,6 +51,16 @@ class Level3 extends Phaser.Scene {
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
             infernoStage++;
             this.scene.start('level4');
+        }
+        //flash image
+        if (Phaser.Math.Between(0, 500) < 1) {
+            this.imageVisibility = 1;
+        }
+        this.backgroundImage.setPosition(this.cameras.main.scrollX, this.cameras.main.scrollY)
+        this.backgroundImage.setAlpha(this.imageVisibility);
+        this.imageVisibility -= 0.01;
+        if (this.imageVisibility <= 0) {
+            this.imageVisibility = 0;
         }
     }
 

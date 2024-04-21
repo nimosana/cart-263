@@ -14,6 +14,7 @@ class Level4 extends Phaser.Scene {
         this.saidWow = false;
         this.gameLost = false;
         this.fatness = 0;
+        this.ratio;
         this.stageName = 'Greed';
     }
 
@@ -36,6 +37,10 @@ class Level4 extends Phaser.Scene {
         this.cameras.main.startFollow(this.user);
         this.physics.add.overlap(this.monies, this.user, this.userMoneyCollider, null, this);
         // add and set text objects
+        this.backgroundImage = this.add.image(0, 0, 'greed')
+            .setOrigin(0, 0);
+        this.ratio = (this.scale.height / this.backgroundImage.height);
+        this.backgroundImage.setScale(this.ratio * 1, this.ratio * 1);
         Scores.initText(this);
         myVoice.speak(`Those whose attitude toward material goods deviated from the appropriate mean are punished in the fourth circle. They include the avaricious or miserly, including many clergymen, and popes and cardinals who hoarded possessions, and the prodigal, who squandered them. The hoarders and spendthrifts joust, using great weights as weapons that they push with their chests`);
     }
@@ -49,6 +54,16 @@ class Level4 extends Phaser.Scene {
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
             infernoStage++;
             this.scene.start('level5');
+        }
+        //flash image
+        if (Phaser.Math.Between(0, 500) < 1) {
+            this.imageVisibility = 1;
+        }
+        this.backgroundImage.setPosition(this.cameras.main.scrollX - 200, this.cameras.main.scrollY)
+        this.backgroundImage.setAlpha(this.imageVisibility);
+        this.imageVisibility -= 0.01;
+        if (this.imageVisibility <= 0) {
+            this.imageVisibility = 0;
         }
     }
 
