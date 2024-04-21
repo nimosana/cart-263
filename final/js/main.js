@@ -1,11 +1,33 @@
 /** 9 Circles
  * @author Nicolas Morales-Sanabria
+ * 
 */
 
 "use strict";
 setInterval(moveBackground, 50);
 let backgroundPos = 0;
 let myVoice = new p5.Speech();
+let playlist;
+function preload() {
+    noCanvas();
+    playlist = [{
+        sound: loadSound('assets/sounds/Ann-Clue_Roadtrip.mp3'),
+        name: `Roadtrip`,
+        artist: `Ann Clue & Boris Brejcha`
+    }, {
+        sound: loadSound('assets/sounds/NTO-Carrousel.mp3'),
+        name: `Carrousel`,
+        artist: `NTO`
+    }, {
+        sound: loadSound('assets/sounds/CABLE-Vanisher.mp3'),
+        name: `Vanisher`,
+        artist: `CABLE`
+    }];
+}
+function setup() {
+    let musicPlayer = new PlaylistPlayer(`soundtrack`, playlist);
+    musicPlayer.playlistStart();
+}
 
 let config = {
     type: Phaser.AUTO,
