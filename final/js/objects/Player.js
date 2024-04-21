@@ -37,7 +37,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         scene.sound.add('heal').play({ volume: 1 });
         (this.hp < 100) && (this.hp = 100);
         scene.healing.remove(heal);
-        scene.removeObj(heal);
+        General.removeObj(heal);
     }
 
     // /** hurts and kills the user depending on their health*/

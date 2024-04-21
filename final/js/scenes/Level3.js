@@ -83,9 +83,7 @@ class Level3 extends Phaser.Scene {
             .setPosition(cam.scrollX + this.scale.width * 0.7, cam.scrollY + this.scale.height * 0.05)
             .setAlpha(1);
         this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
-        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
-            .setPosition(cam.scrollX + 50, cam.scrollY + 500)
-            .setAlpha(0);
+        this.scoreText.setText([``]);
     }
 
     /** hurts the player when picking up a cookie */

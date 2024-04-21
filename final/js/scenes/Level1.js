@@ -12,7 +12,6 @@ class Level1 extends Phaser.Scene {
         this.comboNumber = this.comboTimer = 0;
         this.newCombo = true;
         this.firstSpawn = true;
-        this.saidWow = false;
         this.gameLost = false;
         this.seaBlood = 0;
         this.stageName = 'Limbo';
@@ -209,7 +208,6 @@ class Level1 extends Phaser.Scene {
                 this.comboTimer = 0;
             }
         } else {
-            this.saidWow = false;
             this.comboTimer = this.comboNumber = 0;
         }
         this.stageText.setText(this.stageName)

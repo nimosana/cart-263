@@ -43,4 +43,25 @@ class General {
         // Restart scene
         current.scene.restart();
     }
+
+    static comboAnnouncer(scene) {
+        scene.killTimer++;
+        scene.comboTimer++;
+        (scene.killTimer > 250) && (scene.killCombo = 0);
+        if (scene.comboTimer < 250) {
+            if (scene.comboNumber >= 2 && scene.newCombo) {
+                scene.newCombo = false;
+                scene.comboTimer = 0;
+                if (scene.comboNumber < 11) {
+                    scene.sound.add(`combo-${scene.comboNumber}`).play({ volume: 5 });
+                } else if (scene.comboNumber >= 11 && !scene.saidWow) {
+                    scene.saidWow = true;
+                    scene.sound.add(`combo-${scene.comboNumber}`).play({ volume: 10 });
+                }
+            }
+        } else {
+            scene.saidWow = false;
+            scene.comboTimer = scene.comboNumber = 0;
+        }
+    }
 }

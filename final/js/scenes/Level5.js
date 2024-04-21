@@ -155,7 +155,6 @@ class Level5 extends Phaser.Scene {
     fireEnemyBullet(enemy) {
         let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
             .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800)
-        // .setTint(0xff0000);
         let soundDist = (((Phaser.Math.Clamp(Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y) / 700, 0, 1)) - 1) * -1);
         this.sound.add('shoot').play({ volume: soundDist });
         bullet.body.setMass(200);
@@ -194,24 +193,7 @@ class Level5 extends Phaser.Scene {
 
     /** displays scores and combos keeping track of them */
     textAndCombos(cam) {
-        this.killTimer++;
-        this.comboTimer++;
-        (this.killTimer > 250) && (this.killCombo = 0);
-        if (this.comboTimer < 250) {
-            if (this.comboNumber >= 2 && this.newCombo) {
-                this.newCombo = false;
-                this.comboTimer = 0;
-                if (this.comboNumber < 11) {
-                    this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
-                } else if (this.comboNumber >= 11 && !this.saidWow) {
-                    this.saidWow = true;
-                    this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
-                }
-            }
-        } else {
-            this.saidWow = false;
-            this.comboTimer = this.comboNumber = 0;
-        }
+        General.comboAnnouncer(this);
         this.stageText.setText(this.stageName)
             .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
             .setAlpha(1);

@@ -7,6 +7,7 @@ class Level2 extends Phaser.Scene {
     /** allows the creation of a scene for the lust game, initializing it with required params */
     constructor() {
         super({ key: `level2` });
+        //required variables 
         this.score = this.killTimer = this.kills = this.killCombo = 0;
         this.comboNumber = this.comboTimer = 0;
         this.newCombo = true;

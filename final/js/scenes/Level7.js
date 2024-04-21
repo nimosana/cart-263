@@ -3,11 +3,12 @@
  * They are stuck here, and dying doesn't make anything better.
  * Runnable after boot */
 class Level7 extends Phaser.Scene {
-    /** allows the creation of a scene for the violence game, initializing it with required params */
+    /** allows the creation of a scene for the war game, initializing it with required params */
     constructor() {
         super({
             key: `level7`
         });
+        this.userXAcc = this.userYAcc = this.userXSpd = this.userYSpd = 0;
         this.score = 0;
         this.kills = 0;
         this.killTimer = 0;
@@ -47,8 +48,6 @@ class Level7 extends Phaser.Scene {
             quantity: 0,
             bounceX: 1,
             bounceY: 1,
-            x: -450,
-            y: -450,
             dragX: 50,
             dragY: 50,
             mass: 50,
@@ -64,23 +63,9 @@ class Level7 extends Phaser.Scene {
         this.physics.add.collider(this.enemies, this.enemies);
         this.physics.add.collider(this.enemies, this.bulletsPlayer, this.bulletHitEnemy, null, this);
         this.physics.add.collider(this.bulletsEnemies, this.user, this.bulletHitUser, null, this);
-        this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
+        this.physics.add.overlap(this.healing, this.user, this.userHeal, null, this);
         // add and set text objects
-        this.scoreText = this.add.text(0, 0, '', { fontSize: '32px', fontFamily: 'IMPACT', fill: '#ffffff' })
-            .setAlign('left')
-            .setOrigin(0, 7);
-        this.murderText = this.add.text(0, 0, '', { fontSize: '32px', fontFamily: 'IMPACT', fill: '#ffffff' })
-            .setAlign('center')
-            .setOrigin(0.5, 0)
-            .setAlpha(0);
-        this.diedText = this.add.text(0, 0, 'YOU STAY HERE\nPress enter to restart', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
-            .setAlign('center')
-            .setOrigin(0.5, 0)
-            .setAlpha(0);
-        this.stageText = this.add.text(0, 0, 'Stage', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
-            .setAlign('center')
-            .setOrigin(0.5, 0.5)
-            .setAlpha(0);
+        Scores.initText(this);
         //user shoot inputs
         this.input.on('pointerdown', (pointer) => {
             this.userShoot();
@@ -94,7 +79,17 @@ class Level7 extends Phaser.Scene {
     }
 
     /** heals the player when picking up a heart */
-    userHealCollider = (heal, user) => { this.user.heal(this, heal); }
+    userHealCollider = (heal, user) => { this.userHeal(this, heal); }
+
+    /** heals the player when picking up a heart */
+    userHeal(heal, user) {
+        this.sound.add('heal').play({ volume: 1 });
+        if (this.userHp < 100) {
+            this.userHp = 100;
+        }
+        this.healing.remove(heal);
+        General.removeObj(heal);
+    }
 
     /** makes the user shoot bullets */
     userShoot() {
@@ -153,29 +148,9 @@ class Level7 extends Phaser.Scene {
 
     /** displays scores and combos keeping track of them */
     textAndCombos(cam) {
-        this.killTimer++;
-        if (this.killTimer > 250) {
-            this.killCombo = 0;
-        }
-        this.comboTimer++;
-        if (this.comboTimer < 250) {
-            if (this.comboNumber >= 2 && this.newCombo) {
-                this.newCombo = false;
-                this.comboTimer = 0;
-                if (this.comboNumber < 11) {
-                    console.log(`playing combo-${this.comboNumber}`)
-                    this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
-                } else if (this.comboNumber >= 11 && !this.saidWow) {
-                    this.saidWow = true;
-                    this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
-                }
-            }
-        } else {
-            this.saidWow = false;
-            this.comboTimer = this.comboNumber = 0;
-        }
+        General.comboAnnouncer(this);
         this.stageText.setText(this.stageName)
-            .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
+            .setPosition(cam.scrollX + this.scale.width * 0.7, cam.scrollY + this.scale.height * 0.05)
             .setAlpha(1);
         this.murderText.setText(['MURDER COMBO: ' + this.killCombo])
             .setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 3)
