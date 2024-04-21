@@ -8,7 +8,6 @@ class Level7 extends Phaser.Scene {
         super({
             key: `level7`
         });
-        this.userXAcc = this.userYAcc = this.userXSpd = this.userYSpd = 0;
         this.score = 0;
         this.kills = 0;
         this.killTimer = 0;
@@ -65,7 +64,7 @@ class Level7 extends Phaser.Scene {
         this.physics.add.collider(this.enemies, this.enemies);
         this.physics.add.collider(this.enemies, this.bulletsPlayer, this.bulletHitEnemy, null, this);
         this.physics.add.collider(this.bulletsEnemies, this.user, this.bulletHitUser, null, this);
-        this.physics.add.overlap(this.healing, this.user, this.userHeal, null, this);
+        this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
         // add and set text objects
         this.scoreText = this.add.text(0, 0, '', { fontSize: '32px', fontFamily: 'IMPACT', fill: '#ffffff' })
             .setAlign('left')
@@ -94,6 +93,9 @@ class Level7 extends Phaser.Scene {
         this.graphics.fillStyle(0x00ff00, 1);
     }
 
+    /** heals the player when picking up a heart */
+    userHealCollider = (heal, user) => { this.user.heal(this, heal); }
+
     /** makes the user shoot bullets */
     userShoot() {
         if (this.userHp > 1) {
@@ -114,16 +116,6 @@ class Level7 extends Phaser.Scene {
         this.graphics.clear();
         this.graphics.fillStyle(0x00ff00, 1);
         this.graphics.fillRectShape(this.rect);
-    }
-
-    /** heals the player when picking up a heart */
-    userHeal(heal, user) {
-        this.sound.add('heal').play({ volume: 1 });
-        if (this.userHp < 100) {
-            this.userHp = 100;
-        }
-        this.healing.remove(heal);
-        this.removeObj(heal);
     }
 
     /** Updates the scene/game */
@@ -226,26 +218,20 @@ class Level7 extends Phaser.Scene {
     bulletHitEnemy(bullet, enemy) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
-        this.removeObj(bullet);
+        General.removeObj(bullet);
 
         if (enemy.hp < 1) {
             let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
             soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
             this.sound.add('scream').play({ volume: soundDist });
-            this.murderText.setAlpha(1);
-            this.killCombo++;
-            this.comboNumber++;
-            this.score += this.killCombo;
-            this.kills++;
-            this.killTimer = 0;
+            General.enemyDeathShared(this);
             let random = Phaser.Math.Between(0, 100);
             if (random < 50) {
                 let heal = this.physics.add.sprite(enemy.x, enemy.y, "heart");
                 this.healing.add(heal);
             }
-            this.newCombo = true;
             this.enemies.remove(enemy);
-            this.removeObj(enemy);
+            General.removeObj(enemy);
         }
     }
 
@@ -254,14 +240,14 @@ class Level7 extends Phaser.Scene {
         this.userHp -= 10;
         console.log(this.userHp)
         this.bulletsEnemies.remove(bullet)
-        this.removeObj(bullet);
+        General.removeObj(bullet);
 
         if (this.userHp < 1) {
             this.gameLost = true;
             this.deaths++;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
-            this.removeObj(user);
+            General.removeObj(user);
         }
     }
 
@@ -270,13 +256,13 @@ class Level7 extends Phaser.Scene {
         this.bulletsPlayer.children.each(bullet => {
             if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
                 this.bulletsPlayer.remove(bullet);
-                this.removeObj(bullet);
+                General.removeObj(bullet);
             }
         });
         this.bulletsEnemies.children.each(bullet => {
             if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
                 this.bulletsEnemies.remove(bullet);
-                this.removeObj(bullet);
+                General.removeObj(bullet);
             }
         });
         this.enemies.children.each(enemy => {
@@ -304,23 +290,10 @@ class Level7 extends Phaser.Scene {
         this.sound.add('impact').play({ volume: 1 });
 
         if (enemy.hp < 1) {
-            this.murderText.setAlpha(1);
-            this.killCombo++;
-            this.comboNumber++;
-            this.score += this.killCombo;
-            this.kills++;
-            this.killTimer = 0;
+            General.enemyDeathShared(this);
             this.sound.add('scream').play({ volume: 1 });
             this.enemies.remove(enemy)
-            this.newCombo = true;
-            this.removeObj(enemy);
+            General.removeObj(enemy);
         }
-    }
-
-    /** removes an object from the physics engine */
-    removeObj(obj) {
-        obj.body.destroy();
-        obj.setActive(false);
-        obj.setVisible(false);
     }
 }

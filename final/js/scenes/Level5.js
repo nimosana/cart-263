@@ -63,9 +63,8 @@ class Level5 extends Phaser.Scene {
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
             // this.score = this.kills = 0;
             if (this.score < 255) {
-                this.resetPlayScene();
+                General.resetPlayScene();
             } else {
-                // this.resetPlayScene();
                 this.scene.start('level6');
             }
         }
@@ -80,18 +79,11 @@ class Level5 extends Phaser.Scene {
     /** heals the player when picking up a heart */
     userHealCollider = (heal, user) => { this.user.heal(this, heal); }
 
-    /** removes an object from the physics engine */
-    removeObj(obj) {
-        obj.body.destroy();
-        obj.setActive(false);
-        obj.setVisible(false);
-    }
-
     /** removes bullets that are outside the viewable zone */
     removeBullets(bullet, group) {
         if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
             group.remove(bullet);
-            this.removeObj(bullet);
+            General.removeObj(bullet);
         }
     }
 
@@ -174,21 +166,15 @@ class Level5 extends Phaser.Scene {
     enemyHit(bullet, enemy) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
-        this.removeObj(bullet);
+        General.removeObj(bullet);
         if (enemy.hp < 1) {
             let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
             soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
             this.sound.add('scream').play({ volume: soundDist });
-            this.murderText.setAlpha(1);
-            this.killCombo++;
-            this.kills++;
-            this.comboNumber++;
-            this.score += this.killCombo;
-            this.killTimer = 0;
+            General.enemyDeathShared(this);
             (Phaser.Math.Between(0, 100) < 50) && this.healing.add(this.physics.add.sprite(enemy.x, enemy.y, "heart"));
-            this.newCombo = true;
             this.enemies.remove(enemy);
-            this.removeObj(enemy);
+            General.removeObj(enemy);
         }
     }
 
@@ -196,13 +182,13 @@ class Level5 extends Phaser.Scene {
     bulletHit(bullet, user) {
         this.user.hp -= 10;
         this.bulletsEnemies.remove(bullet);
-        this.removeObj(bullet);
+        General.removeObj(bullet);
         if (this.user.hp < 1) {
             myVoice.speak(`Thank you for your service`);
             this.gameLost = true;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
-            this.removeObj(user);
+            General.removeObj(user);
         }
     }
 
@@ -235,30 +221,5 @@ class Level5 extends Phaser.Scene {
         this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
         this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
             .setPosition(cam.scrollX + 50, cam.scrollY + 500);
-    }
-
-    resetPlayScene() {
-        // Remove all bullets and enemies
-        this.bulletsPlayer.clear(true, true);
-        this.bulletsEnemies.clear(true, true);
-        this.enemies.clear(true, true);
-
-        // Clear any active timers or intervals
-        clearInterval(this.shootInterval);
-        clearTimeout(this.killTimer);
-        clearInterval(this.comboTimer);
-
-        // Reset scene-specific variables
-        this.score = 0;
-        this.kills = 0;
-        this.killCombo = 0;
-        this.comboNumber = 0;
-        this.newCombo = true;
-        this.firstSpawn = true;
-        this.saidWow = false;
-        this.gameLost = false;
-
-        // Restart scene
-        this.scene.restart();
     }
 }

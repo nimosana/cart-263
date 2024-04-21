@@ -55,13 +55,6 @@ class Level4 extends Phaser.Scene {
     /** hurts the player when picking up money */
     userMoneyCollider = (money, user) => { this.pickMoney(user, money); }
 
-    /** removes an object from the physics engine */
-    removeObj(obj) {
-        obj.body.destroy();
-        obj.setActive(false);
-        obj.setVisible(false);
-    }
-
     /** moves the user using the arrow keys */
     userMovement() {
         const { left, right, up, down } = this.cursors;
@@ -92,12 +85,12 @@ class Level4 extends Phaser.Scene {
     bulletHit(bullet) {
         // this.hp -= 10;
         this.bulletsmonies.remove(bullet);
-        this.removeObj(bullet);
+        General.removeObj(bullet);
         if (this.hp < 1) {
             this.gameLost = true;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
-            this.removeObj(this);
+            General.removeObj(this);
         }
     }
 
@@ -119,9 +112,9 @@ class Level4 extends Phaser.Scene {
         if (this.user.hp <= 0) {
             this.gameLost = true;
             this.diedText.setAlpha(1);
-            this.removeObj(this.user);
+            General.removeObj(this.user);
         }
         this.monies.remove(cookie);
-        this.removeObj(cookie);
+        General.removeObj(cookie);
     }
 }

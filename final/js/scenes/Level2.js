@@ -68,18 +68,11 @@ class Level2 extends Phaser.Scene {
     /** heals the player when picking up a heart */
     userHeartCollider = (heal, user) => { this.pickHeart(heal); }
 
-    /** removes an object from the physics engine */
-    removeObj(obj) {
-        obj.body.destroy();
-        obj.setActive(false);
-        obj.setVisible(false);
-    }
-
     /** removes bullets that are outside the viewable zone */
     removeBullets(bullet, group) {
         if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
             group.remove(bullet);
-            this.removeObj(bullet);
+            General.removeObj(bullet);
         }
     }
 
@@ -148,7 +141,7 @@ class Level2 extends Phaser.Scene {
     /** hurts and kills the user depending on their health*/
     bulletHit(bullet) {
         this.bulletsEnemies.remove(bullet);
-        this.removeObj(bullet);
+        General.removeObj(bullet);
     }
 
     /** makes the user shoot bullets in the direction they're going */
@@ -165,19 +158,15 @@ class Level2 extends Phaser.Scene {
     enemyHit(bullet, enemy) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
-        this.removeObj(bullet);
+        General.removeObj(bullet);
         if (enemy.hp < 1) {
-            this.killCombo++;
-            this.kills++;
-            this.comboNumber++;
-            this.score += this.killCombo;
-            this.killTimer = 0;
+            General.enemyDeathShared(this);
             let soundDist = Phaser.Math.Distance.Between(this.user.x, this.user.y, enemy.x, enemy.y);
             soundDist = (((Phaser.Math.Clamp(soundDist / 700, 0, 1)) - 1) * -1);
             this.murderText.setAlpha(1);
             (Phaser.Math.Between(0, 100) < 50) && this.healing.add(this.physics.add.sprite(enemy.x, enemy.y, "heart"));
             this.enemies.remove(enemy);
-            this.removeObj(enemy);
+            General.removeObj(enemy);
         }
     }
 
@@ -197,9 +186,9 @@ class Level2 extends Phaser.Scene {
         if (this.user.hp <= 0) {
             this.gameLost = true;
             this.diedText.setAlpha(1);
-            this.removeObj(this.user);
+            General.removeObj(this.user);
         }
         this.healing.remove(heal);
-        this.removeObj(heal);
+        General.removeObj(heal);
     }
 }

@@ -40,7 +40,9 @@ class Level3 extends Phaser.Scene {
     /** Updates the scene/game */
     update() {
         this.userMovement();
-        this.textAndCombos(this.cameras.main);
+        this.stageText.setText(this.stageName)
+            .setPosition(this.cameras.main.scrollX + this.scale.width * 0.7, this.cameras.main.scrollY + this.scale.height * 0.05)
+            .setAlpha(1);
         this.user.healthBar(this);
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
@@ -51,13 +53,6 @@ class Level3 extends Phaser.Scene {
 
     /** hurts the player when picking up a cookie */
     userCookieCollider = (cookie, user) => { this.pickCookie(user, cookie); }
-
-    /** removes an object from the physics engine */
-    removeObj(obj) {
-        obj.body.destroy();
-        obj.setActive(false);
-        obj.setVisible(false);
-    }
 
     /** moves the user using the arrow keys */
     userMovement() {
@@ -84,17 +79,6 @@ class Level3 extends Phaser.Scene {
         this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
     }
 
-    /** displays scores and combos keeping track of them */
-    textAndCombos(cam) {
-        this.stageText.setText(this.stageName)
-            .setPosition(cam.scrollX + this.scale.width * 0.7, cam.scrollY + this.scale.height * 0.05)
-            .setAlpha(1);
-        this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
-        this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
-            .setPosition(cam.scrollX + 50, cam.scrollY + 500)
-            .setAlpha(0);
-    }
-
     /** hurts the player when picking up a cookie */
     pickCookie(cookie, user) {
         this.user.hp -= 10;
@@ -103,9 +87,9 @@ class Level3 extends Phaser.Scene {
         if (this.user.hp <= 0) {
             this.gameLost = true;
             this.diedText.setAlpha(1);
-            this.removeObj(this.user);
+            General.removeObj(this.user);
         }
         this.enemies.remove(cookie);
-        this.removeObj(cookie);
+        General.removeObj(cookie);
     }
 }
