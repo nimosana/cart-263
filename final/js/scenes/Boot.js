@@ -13,7 +13,7 @@ class Boot extends Phaser.Scene {
         this.load.image(`enemy-2`, `assets/images/enemy-2.png`);
         this.load.image(`enemy-5`, `assets/images/tankEnemy.png`);
         this.load.image(`boat`, `assets/images/boat3.png`);
-        //backgrounds
+        //backgrounds & images
         this.load.image('gluttony', `assets/images/gluttony.png`)
         this.load.image('greed', `assets/images/greed.jpg`)
         this.load.image('heresy', `assets/images/heresy.png`);
@@ -42,6 +42,6 @@ class Boot extends Phaser.Scene {
         for (let i = 2; i <= comboSounds; i++) {
             this.load.audio(`combo-${i}`, `assets/sounds/kill-${i}.mp3`);
         }
-        this.load.on(`complete`, () => { this.scene.start(`level3`); });
+        this.load.on(`complete`, () => { this.scene.start(`level4`); });
     }
 }

@@ -4,7 +4,7 @@
  * Runnable after boot */
 class Level5 extends Phaser.Scene {
 
-    /** allows the creation of a scene for the war game, initializing it with required params */
+    /** allows the creation of a scene for the Wrath game, initializing it with required params */
     constructor() {
         super({ key: `level5` });
         this.score = this.killTimer = this.kills = this.killCombo = 0;
@@ -18,7 +18,7 @@ class Level5 extends Phaser.Scene {
         this.bloodTint = (`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1));
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the Wrath game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -152,6 +152,7 @@ class Level5 extends Phaser.Scene {
         }
     }
 
+    /** Fires a bullet from an enemy towards the player. */
     fireEnemyBullet(enemy) {
         let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
             .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800)
@@ -162,6 +163,7 @@ class Level5 extends Phaser.Scene {
         this.bulletsEnemies.add(bullet);
     }
 
+    /** Updates enemy health, removes bullet, plays sounds, increments kills, and adds potential healing item on death. */
     enemyHit(bullet, enemy) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
@@ -191,7 +193,7 @@ class Level5 extends Phaser.Scene {
         }
     }
 
-    /** displays scores and combos keeping track of them */
+    /** displays scores and combos keeping track of them, plays combo voice */
     textAndCombos(cam) {
         General.comboAnnouncer(this);
         this.stageText.setText(this.stageName)

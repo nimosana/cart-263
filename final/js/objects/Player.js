@@ -1,3 +1,4 @@
+/** allows the creation of players as physics sprite objects */
 class Player extends Phaser.Physics.Arcade.Sprite {
     /** creates an instance of a Player Sprite */
     constructor(scene, x, y, texture) {

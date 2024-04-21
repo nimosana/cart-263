@@ -1,6 +1,6 @@
+/** allows the use of general, shared functions */
 class General {
-    static createShared() {
-    }
+    /** default actions when an enemy dies */
     static enemyDeathShared(scene) {
         scene.murderText.setAlpha(1);
         scene.killCombo++;
@@ -11,14 +11,14 @@ class General {
         scene.newCombo = true;
     }
 
-    /** removes an object from the physics engine */
+    /** default actions to remove a physics object */
     static removeObj(obj) {
         obj.body.destroy();
         obj.setActive(false);
         obj.setVisible(false);
     }
 
-    /**  */
+    /** default actions to reset a scene */
     static resetPlayScene(current) {
         // Remove all bullets and enemies
         current.bulletsPlayer.clear(true, true);
@@ -44,6 +44,7 @@ class General {
         current.scene.restart();
     }
 
+    /** default functionality of the combo counter & announcer */
     static comboAnnouncer(scene) {
         scene.killTimer++;
         scene.comboTimer++;

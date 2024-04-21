@@ -53,7 +53,7 @@ class Level2 extends Phaser.Scene {
         this.spawnEnemies();
         this.textAndCombos(this.cameras.main);
         this.user.healthBar(this);
-        // Check enter keypress after loss / Reset the scene and physics
+        // starts next scene after death
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
             infernoStage++;
             this.scene.start('level3');
@@ -69,7 +69,7 @@ class Level2 extends Phaser.Scene {
     /** heals the player when picking up a heart */
     userHeartCollider = (heal, user) => { this.pickHeart(heal); }
 
-    /** removes bullets that are outside the viewable zone */
+    /** removes bullet hearts that are outside the viewable zone */
     removeBullets(bullet, group) {
         if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
             group.remove(bullet);
@@ -77,6 +77,7 @@ class Level2 extends Phaser.Scene {
         }
     }
 
+    /** spawns increasingly more enemies near the player's position as they kill more. */
     spawnEnemies() {
         if (this.enemies.getLength() < this.kills || this.firstSpawn) {
             this.firstSpawn = false;
@@ -131,6 +132,7 @@ class Level2 extends Phaser.Scene {
         this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
     }
 
+    /** Fires a heart from an enemy towards the player. */
     fireEnemyBullet(enemy) {
         let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
             .setVelocity(enemy.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, enemy.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800);
@@ -139,13 +141,13 @@ class Level2 extends Phaser.Scene {
         this.bulletsEnemies.add(bullet);
     }
 
-    /** hurts and kills the user depending on their health*/
+    /** deletes heart bullets on hit*/
     bulletHit(bullet) {
         this.bulletsEnemies.remove(bullet);
         General.removeObj(bullet);
     }
 
-    /** makes the user shoot bullets in the direction they're going */
+    /** makes the user shoot hearts in the direction they're going */
     userShoot() {
         if (this.user.hp > 1) {
             let bullet = new Bullet(this, this.user.x, this.user.y, bulletTypes[infernoStage])
@@ -156,6 +158,7 @@ class Level2 extends Phaser.Scene {
         }
     }
 
+    /** Updates enemy health, removes bullet, plays sounds, increments kills, and adds potential hurting item on death. */
     enemyHit(bullet, enemy) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
@@ -182,6 +185,7 @@ class Level2 extends Phaser.Scene {
             .setAlpha(0);
     }
 
+    /** hurts the player & removes the heart */
     pickHeart(heal) {
         this.user.hp -= 10;
         if (this.user.hp <= 0) {

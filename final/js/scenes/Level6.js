@@ -3,7 +3,7 @@
  * Runnable after boot */
 class Level6 extends Phaser.Scene {
 
-    /** allows the creation of a scene for the war game, initializing it with required params */
+    /** allows the creation of a scene for the Heresy scene, initializing it with required params */
     constructor() {
         super({ key: `level6` });
         this.imageVisibility = 0;
@@ -14,7 +14,7 @@ class Level6 extends Phaser.Scene {
         this.stageName = 'Heresy';
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the Heresy scene */
     create() {
         // interaction setup
         this.backgroundImage = this.add.image(0, 0, 'heresy')
@@ -23,7 +23,7 @@ class Level6 extends Phaser.Scene {
         setInterval(this.startFading, 8000);
     }
 
-    /** Updates the scene/game */
+    /** Updates the scene */
     update() {
         /** makes the image fade in and starts the dialogue */
         this.fadeIn();

@@ -1,3 +1,4 @@
+/** allows the creation and setup of general shared text objects */
 class Scores {
     /** creates the text objects required to display the score, kills or death of the user  */
     static initText(scene) {

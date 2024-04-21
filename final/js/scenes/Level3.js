@@ -1,4 +1,4 @@
-/** Creates the scene for the 3nd circle, Gluttony.
+/** Creates the scene for the 3rd circle, Gluttony.
  * The player must eat cookies until they die.
  * When they die, they go to the next circle.
  * Runnable after boot */
@@ -14,7 +14,7 @@ class Level3 extends Phaser.Scene {
         this.stageName = 'Gluttony';
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the Gluttony game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();

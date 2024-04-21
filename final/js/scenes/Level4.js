@@ -18,7 +18,7 @@ class Level4 extends Phaser.Scene {
         this.stageName = 'Greed';
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the greed game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -93,19 +93,6 @@ class Level4 extends Phaser.Scene {
         ((up.isDown || keyboard.up.isDown) && (!down.isDown && !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 500 - this.fatness, body.acceleration);
         ((down.isDown || keyboard.down.isDown) && (!up.isDown && !keyboard.up.isDown)) && this.physics.velocityFromRotation(this.user.rotation, -600, body.acceleration);
         this.user.setVelocity(body.velocity.x / 1.05, body.velocity.y / 1.05); // lower speed always
-    }
-
-
-    /** hurts and kills the user depending on their health*/
-    bulletHit(bullet) {
-        this.bulletsmonies.remove(bullet);
-        General.removeObj(bullet);
-        if (this.hp < 1) {
-            this.gameLost = true;
-            this.diedText.setAlpha(1);
-            this.sound.add('scream').play({ volume: 1 });
-            General.removeObj(this);
-        }
     }
 
     /** displays stage title */
