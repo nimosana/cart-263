@@ -1,9 +1,12 @@
-/** Creates the scene for the war game and every element it contains, run after Boot */
+/** Creates the scene for the 1st circle, Limbo.
+ * The player must throw bullets towards hostile crowds to avoid getting lapidated.
+ * Runnable after boot */
 class Level1 extends Phaser.Scene {
 
-    /** allows the creation of a scene for the war game, initializing it with required params */
+    /** allows the creation of a scene for the limbo game, initializing it with required params */
     constructor() {
         super({ key: `level1` });
+        //required variables 
         this.score = this.killTimer = this.kills = this.killCombo = 0;
         this.comboNumber = this.comboTimer = 0;
         this.newCombo = true;
@@ -14,7 +17,7 @@ class Level1 extends Phaser.Scene {
         this.stageName = 'Limbo';
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the limbo game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -35,16 +38,13 @@ class Level1 extends Phaser.Scene {
         // add and set text objects
         Scores.initText(this);
         myVoice.speak("The first circle of hell is depicted in Dante Alighieri's 14th-century poem Inferno, the first part of the Divine Comedy. Inferno tells the story of Dante's journey through a vision of hell ordered into nine circles corresponding to classifications of sin. The first circle is Limbo, the space reserved for those souls who died before baptism and for those who hail from non-Christian cultures. They live eternally in a castle set on a verdant landscape, but forever removed from heaven.");
-        // Add event listener for shooting while space is pressed down
+        // Add event listener for shooting while space is pressed 
         this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
         this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
-        this.levelTexturer();
     }
 
     /** Updates the scene/game */
     update() {
-        console.log(`infstage ` + infernoStage)
-
         this.userMovement();
         this.bulletsPlayer.children.each(bullet => { this.removeBullets(bullet, this.bulletsPlayer) });
         this.bulletsEnemies.children.each(bullet => { this.removeBullets(bullet, this.bulletsEnemies) });
@@ -54,7 +54,6 @@ class Level1 extends Phaser.Scene {
         this.user.healthBar(this);
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
-            // this.score = this.kills = 0;
             if (this.score < 255) {
                 this.resetPlayScene();
             } else {
@@ -64,19 +63,11 @@ class Level1 extends Phaser.Scene {
         }
     }
 
-    /** */
-    levelTexturer() {
-        if (infernoStage === 2) {
-            this.ground.setTexture(`sand`);
-            this.ground.clearTint();
-        }
-    }
+    /** removes rock and hurts/kills enemies when colliding with a user rock */
+    bulletHitEnemyCollider = (rock, enemy) => { this.enemyHit(enemy, rock); }
 
-    /** removes bullet and hurts/kills enemies when colliding with a user bullet */
-    bulletHitEnemyCollider = (bullet, enemy) => { this.enemyHit(enemy, bullet); }
-
-    /** removes bullet and hurts/kills user when colliding with a enemy bullet */
-    bulletHitUserCollider = (bullet, user) => { this.bulletHit(bullet); }
+    /** removes rock and hurts/kills user when colliding with a enemy rock */
+    bulletHitUserCollider = (rock, user) => { this.bulletHit(rock); }
 
     /** heals the player when picking up a heart */
     userHealCollider = (heal, user) => { this.user.heal(this, heal); }
@@ -88,7 +79,7 @@ class Level1 extends Phaser.Scene {
         obj.setVisible(false);
     }
 
-    /** removes bullets that are outside the viewable zone */
+    /** removes rock that are outside the viewable zone */
     removeBullets(bullet, group) {
         if (Phaser.Math.Distance.Between(bullet.x, bullet.y, this.user.x, this.user.y) > 600) {
             group.remove(bullet);
@@ -115,6 +106,7 @@ class Level1 extends Phaser.Scene {
             this.user.setAngularVelocity(0);
         } // move forward/backward with up/down
         body.setAngularAcceleration(body.angularAcceleration / 2);
+        //key up & down acceleration
         ((!up.isDown || !keyboard.up.isDown) && (!down.isDown || !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 0, body.acceleration);
         ((up.isDown || keyboard.up.isDown) && (!down.isDown && !keyboard.down.isDown)) && this.physics.velocityFromRotation(this.user.rotation, 750, body.acceleration);
         ((down.isDown || keyboard.down.isDown) && (!up.isDown && !keyboard.up.isDown)) && this.physics.velocityFromRotation(this.user.rotation, -200, body.acceleration);
@@ -141,6 +133,7 @@ class Level1 extends Phaser.Scene {
         enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always
     }
 
+    /** spawns increasingly more enemies near the player's position as they kill more. */
     spawnEnemies() {
         if (this.enemies.getLength() < this.kills || this.firstSpawn) {
             this.firstSpawn = false;
@@ -150,6 +143,7 @@ class Level1 extends Phaser.Scene {
         }
     }
 
+    /** Heals the player, plays healing sound & removes the heart */
     pickHeart(heal) {
         this.user.hp = 100;
         this.sound.add('heal').play({ volume: 0.5 });
@@ -168,6 +162,7 @@ class Level1 extends Phaser.Scene {
         }
     }
 
+    /** Fires a bullet from an enemy towards the player. */
     fireEnemyBullet(enemy) {
         let bullet = new Bullet(this, enemy.x, enemy.y, bulletTypes[infernoStage])
             .setVelocity(this.user.body.velocity.x + Math.cos(Phaser.Math.DegToRad(enemy.angle)) * 800, this.user.body.velocity.y + Math.sin(Phaser.Math.DegToRad(enemy.angle)) * 800)
@@ -177,6 +172,7 @@ class Level1 extends Phaser.Scene {
         this.bulletsEnemies.add(bullet);
     }
 
+    /** Updates enemy health, removes bullet, plays sounds, increments kills, and adds potential healing item on death. */
     enemyHit(enemy, bullet) {
         enemy.hp -= 50;
         this.bulletsPlayer.remove(bullet);
@@ -213,6 +209,7 @@ class Level1 extends Phaser.Scene {
         }
     }
 
+    /** Resets scene variables, removes objects, and restarts scene. */
     resetPlayScene() {
         // Remove all bullets and enemies
         this.bulletsPlayer.clear(true, true);
@@ -247,12 +244,6 @@ class Level1 extends Phaser.Scene {
             if (this.comboNumber >= 2 && this.newCombo) {
                 this.newCombo = false;
                 this.comboTimer = 0;
-                // if (this.comboNumber < 11) {
-                //     // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 5 });
-                // } else if (this.comboNumber >= 11 && !this.saidWow) {
-                //     this.saidWow = true;
-                //     // this.sound.add(`combo-${this.comboNumber}`).play({ volume: 10 });
-                // }
             }
         } else {
             this.saidWow = false;
@@ -261,9 +252,6 @@ class Level1 extends Phaser.Scene {
         this.stageText.setText(this.stageName)
             .setPosition(cam.scrollX + this.scale.width * 0.8, cam.scrollY + this.scale.height * 0.05)
             .setAlpha(1);
-        // this.murderText.setText(['MURDER COMBO: ' + this.killCombo])
-        //     .setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 3)
-        //     .setAlpha(this.murderText.alpha - 0.01);
         this.diedText.setPosition(cam.scrollX + this.scale.width / 2, cam.scrollY + this.scale.height / 6);
         this.scoreText.setText([`Kills: ${this.kills}`, `Score: ${this.score}`])
             .setPosition(cam.scrollX + 50, cam.scrollY + 500);

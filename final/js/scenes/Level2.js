@@ -1,32 +1,33 @@
-/** Creates the scene for the war game and every element it contains, run after Boot */
+/** Creates the scene for the 2nd circle, Lust.
+ * The player must throw hearts towards loving crowds to avoid getting blown away by their love.
+ * Runnable after boot */
 class Level2 extends Phaser.Scene {
 
-    /** allows the creation of a scene for the war game, initializing it with required params */
+    /** allows the creation of a scene for the lust game, initializing it with required params */
     constructor() {
         super({ key: `level2` });
         this.score = this.killTimer = this.kills = this.killCombo = 0;
         this.comboNumber = this.comboTimer = 0;
         this.newCombo = true;
         this.firstSpawn = true;
-        this.saidWow = false;
         this.gameLost = false;
         this.seaBlood = 0;
         this.stageName = 'Lust';
         this.bloodTint = (`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1));
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the lust game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();
         this.physics.world.setBounds(0, 0, 1000, 1000);// create world
-        this.ground = this.add.tileSprite(0, 0, 1800, 1800, 'hearts').setScrollFactor(0, 0);
+        this.ground = this.add.tileSprite(0, 0, 1800, 1800, 'roses').setScrollFactor(0, 0);
         // create and setup groups, objects, physics, camera
         this.bulletsPlayer = this.add.group();
         this.bulletsEnemies = this.add.group();
         this.healing = this.add.group();
         this.enemies = this.physics.add.group();
-        this.user = new Player(this, 0, 0, 'user-2');
+        this.user = new Player(this, 0, 0, 'user-1');
         Player.initHealthBar(this);
         this.user.body.angularDrag = 120;
         this.cameras.main.startFollow(this.user);
@@ -43,9 +44,6 @@ class Level2 extends Phaser.Scene {
 
     /** Updates the scene/game */
     update() {
-        this.seaBlood = Math.min(Math.max(this.score, 0), 255);
-        this.bloodTint = (`0x` + Phaser.Display.Color.RGBToString(this.seaBlood, (255 / 2) - this.seaBlood / 2, 255 - this.seaBlood).substring(1));
-        // this.ground.setTint(this.bloodTint);
         this.userMovement();
         this.bulletsPlayer.children.each(bullet => { this.removeBullets(bullet, this.bulletsPlayer) });
         this.bulletsEnemies.children.each(bullet => { this.removeBullets(bullet, this.bulletsEnemies) });
@@ -88,7 +86,8 @@ class Level2 extends Phaser.Scene {
         if (this.enemies.getLength() < this.kills || this.firstSpawn) {
             this.firstSpawn = false;
             let randomizer = Phaser.Math.Between(-1000, 1000);
-            this.enemies.add(new Enemy(this, this.user.x + Math.sign(randomizer) * this.scale.width / 2, this.user.y + Math.sign(randomizer) * this.scale.height / 2, `enemy-2`));
+            this.enemies.add(new Enemy(this, this.user.x + Math.sign(randomizer) * this.scale.width / 2, this.user.y + Math.sign(randomizer) * this.scale.height / 2, `user-1`))
+                .setTint(`0xFF69B4`);
         }
     }
 
@@ -107,7 +106,7 @@ class Level2 extends Phaser.Scene {
             speed = 800;
         }
         if (Phaser.Math.Distance.Between(enemy.x, enemy.y, this.user.x, this.user.y) < this.scale.width / 4) {
-            speed = 0;
+            speed = -50;
         }
         this.physics.velocityFromRotation(enemy.rotation, speed, enemy.body.acceleration);
         enemy.setVelocity(enemy.body.velocity.x / 1.05, enemy.body.velocity.y / 1.05); // lower speed always

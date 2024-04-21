@@ -1,4 +1,4 @@
-/** Creates the scene for the war game and every element it contains, run after Boot */
+/** Creates the scene for the 7th circle, Violence. Runnable after boot */
 class Level7 extends Phaser.Scene {
     /** allows the creation of a scene for the war game, initializing it with required params */
     constructor() {
@@ -13,13 +13,15 @@ class Level7 extends Phaser.Scene {
         this.firstSpawn = true;
         this.comboTimer = 0;
         this.comboNumber = 0;
+        this.deaths = 0;
         this.newCombo = true;
         this.saidWow = false;
         this.gameLost = false;
+        this.firstLoss = true;
         this.stageName = `Violence`
     }
 
-    /** Creates the initial scene and elements for the war game */
+    /** Creates the initial scene and elements for the violence game */
     create() {
         // interaction setup
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -34,7 +36,7 @@ class Level7 extends Phaser.Scene {
         this.user.body.angularDrag = 120;
         this.userHp = 100;
         this.cameras.main.startFollow(this.user);
-        myVoice.speak("The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.");
+        this.firstLoss && myVoice.speak("The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.");
         this.bulletsPlayer = this.add.group();
         this.bulletsEnemies = this.add.group();
         this.healing = this.add.group();
@@ -69,7 +71,7 @@ class Level7 extends Phaser.Scene {
             .setAlign('center')
             .setOrigin(0.5, 0)
             .setAlpha(0);
-        this.diedText = this.add.text(0, 0, 'YOU DIED\nPress enter to restart', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
+        this.diedText = this.add.text(0, 0, 'YOU STAY HERE\nPress enter to restart', { fontSize: '64px', fontFamily: 'IMPACT', fill: '#ffffff' })
             .setAlign('center')
             .setOrigin(0.5, 0)
             .setAlpha(0);
@@ -130,15 +132,11 @@ class Level7 extends Phaser.Scene {
         this.healthBar();
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
-            if (this.score < 500) {
-                this.score = this.kills = 0;
-                this.gameLost = false;
-                this.scene.restart();
-            } else {
-                infernoStage++;
-                // this.scene.start('level7');
-                this.scene.restart();
-            }
+            infernoStage++;
+            this.deaths++;
+            this.score = 0;
+            this.firstLoss = false;
+            this.scene.restart();
         }
     }
 
@@ -256,6 +254,7 @@ class Level7 extends Phaser.Scene {
 
         if (this.userHp < 1) {
             this.gameLost = true;
+            this.deaths++;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
             this.removeObj(user);

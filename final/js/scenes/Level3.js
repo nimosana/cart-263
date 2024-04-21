@@ -24,7 +24,7 @@ class Level3 extends Phaser.Scene {
 
             this.enemies.create(randomX, randomY, 'cookie');
         }
-        this.user = new Player(this, 0, 0, 'user-2');
+        this.user = new Player(this, 0, 0, 'user-1');
         Player.initHealthBar(this);
         this.user.body.angularDrag = 120;
         this.cameras.main.startFollow(this.user);

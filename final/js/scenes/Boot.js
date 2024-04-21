@@ -1,10 +1,9 @@
-/** initializes the loading of assets for the war game and starts it once ready. */
+/** initializes the loading of assets for the 9 circles game and starts it once ready. */
 class Boot extends Phaser.Scene {
-    /** allows the initialization of the asset loading for the war game */
+    /** allows the initialization of the asset loading for the game */
     constructor() { super({ key: `boot` }); }
     //loads required assets for the game
     preload() {
-        let comboSounds = 11;
         //characters
         this.load.image(`user`, `assets/images/plane2.png`);
         this.load.image(`user-1`, `assets/images/user-1.png`);
@@ -15,11 +14,12 @@ class Boot extends Phaser.Scene {
         this.load.image(`enemy-5`, `assets/images/tankEnemy.png`);
         this.load.image(`boat`, `assets/images/boat3.png`);
         //backgrounds
+        this.load.image('heresy', `assets/images/heresy.png`);
         this.load.image('sea', `assets/images/sea.jpg`);
         this.load.image('grass', `assets/images/grass.jpg`);
         this.load.image('sand', `assets/images/sand.png`);
         this.load.image('dirt', `assets/images/dirt.png`);
-        this.load.image('hearts', 'assets/images/hearts.png');
+        this.load.image('roses', 'assets/images/roses.png');
         this.load.image('greedFloor', 'assets/images/greedFloor.png');
         //misc objects
         this.load.image(`bullet`, `assets/images/bullet.png`);
@@ -28,6 +28,7 @@ class Boot extends Phaser.Scene {
         this.load.image('cookie', 'assets/images/cookie.png');
         this.load.image('money', 'assets/images/money.png');
         //sounds
+        let comboSounds = 11;
         this.load.audio('eat', 'assets/sounds/crunch.mp3');
         this.load.audio('shoot', 'assets/sounds/shoot.mp3');
         this.load.audio('heal', 'assets/sounds/heal.mp3');

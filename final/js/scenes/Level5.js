@@ -63,7 +63,7 @@ class Level5 extends Phaser.Scene {
                 this.resetPlayScene();
             } else {
                 // this.resetPlayScene();
-                this.scene.start('level7');
+                this.scene.start('level6');
             }
         }
     }

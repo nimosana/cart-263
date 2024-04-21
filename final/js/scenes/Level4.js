@@ -21,17 +21,17 @@ class Level4 extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, 1000, 1000);// create world
         this.ground = this.add.tileSprite(0, 0, 1800, 1800, 'greedFloor').setScrollFactor(0, 0);
         // create and setup groups, objects, physics, camera
-        this.enemies = this.physics.add.group();
+        this.monies = this.physics.add.group();
         for (let i = 0; i < 3000; i++) {
             let randomX = Phaser.Math.RND.realInRange(-game.config.width * 20, game.config.width * 20);
             let randomY = Phaser.Math.RND.realInRange(-game.config.width * 20, game.config.width * 20);
-            this.enemies.create(randomX, randomY, 'money');
+            this.monies.create(randomX, randomY, 'money');
         }
-        this.user = new Player(this, 0, 0, 'user-2');
+        this.user = new Player(this, 0, 0, 'user-1');
         Player.initHealthBar(this);
         this.user.body.angularDrag = 120;
         this.cameras.main.startFollow(this.user);
-        this.physics.add.overlap(this.enemies, this.user, this.userMoneyCollider, null, this);
+        this.physics.add.overlap(this.monies, this.user, this.userMoneyCollider, null, this);
         // add and set text objects
         Scores.initText(this);
         myVoice.speak(`Those whose attitude toward material goods deviated from the appropriate mean are punished in the fourth circle. They include the avaricious or miserly, including many clergymen, and popes and cardinals who hoarded possessions, and the prodigal, who squandered them. The hoarders and spendthrifts joust, using great weights as weapons that they push with their chests`);
@@ -50,7 +50,7 @@ class Level4 extends Phaser.Scene {
     }
 
     /** heals the player when picking up a heart */
-    userMoneyCollider = (cookie, user) => { this.pickMoney(user, cookie); }
+    userMoneyCollider = (money, user) => { this.pickMoney(user, money); }
 
     /** removes an object from the physics engine */
     removeObj(obj) {
@@ -87,10 +87,9 @@ class Level4 extends Phaser.Scene {
     /** hurts and kills the user depending on their health*/
     bulletHit(bullet) {
         // this.hp -= 10;
-        this.bulletsEnemies.remove(bullet);
+        this.bulletsmonies.remove(bullet);
         this.removeObj(bullet);
         if (this.hp < 1) {
-            // myVoice.speak(`Thank you for your service`);
             this.gameLost = true;
             this.diedText.setAlpha(1);
             this.sound.add('scream').play({ volume: 1 });
@@ -108,6 +107,7 @@ class Level4 extends Phaser.Scene {
             .setAlpha(0);
     }
 
+    /** hurts the user as they pick up the money */
     pickMoney(cookie, user) {
         this.user.hp -= 10;
         this.fatness += 15;
@@ -117,7 +117,7 @@ class Level4 extends Phaser.Scene {
             this.diedText.setAlpha(1);
             this.removeObj(this.user);
         }
-        this.enemies.remove(cookie);
+        this.monies.remove(cookie);
         this.removeObj(cookie);
     }
 }
