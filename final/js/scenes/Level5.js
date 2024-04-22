@@ -124,7 +124,14 @@ class Level5 extends Phaser.Scene {
         // Check enter keypress after loss / Reset the scene and physics
         if (this.gameLost && this.input.keyboard.checkDown(this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))) {
             infernoStage++;
-            this.scene.start('level6');
+            if (this.score < 255) {
+                this.score = this.kills = 0;
+                this.scene.restart();
+                this.gameLost = false;
+            } else {
+                infernoStage++;
+                this.scene.start('level6');
+            }
         }
     }
 
