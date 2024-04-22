@@ -43,7 +43,7 @@ let config = {
 myVoice.setPitch(0.1);
 let game = new Phaser.Game(config);
 let infernoStage = 1;
-let bulletTypes = ['nothin', 'rock', `heart`, 'nothin', 'nothin', `bullet`, `bullet`, `bullet`];
+let bulletTypes = [`bullet`, 'rock', `heart`, `bullet`, `bullet`, `bullet`, `bullet`, `bullet`];
 
 /** move the background of the html site */
 function moveBackground() {

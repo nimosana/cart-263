@@ -22,7 +22,7 @@ class Level3 extends Phaser.Scene {
         this.ground = this.add.tileSprite(0, 0, 1800, 1800, 'dirt').setScrollFactor(0, 0);
         // create and setup groups, objects, physics, camera
         this.enemies = this.physics.add.group();
-        for (let i = 0; i < 3000; i++) {
+        for (let i = 0; i < 4000; i++) {
             let randomX = Phaser.Math.RND.realInRange(-game.config.width * 20, game.config.width * 20); // Random X position within the game width
             let randomY = Phaser.Math.RND.realInRange(-game.config.width * 20, game.config.width * 20); // Random Y position within the game height
 

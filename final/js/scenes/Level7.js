@@ -45,7 +45,6 @@ class Level7 extends Phaser.Scene {
         (!this.gameFinished) && this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
         (this.gameFinished) && this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 50); });
 
-
         this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
     }
 
