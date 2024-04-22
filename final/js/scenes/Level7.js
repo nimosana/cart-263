@@ -1,6 +1,6 @@
 /** Creates the scene for the 7th circle, Violence.
  * The player must murder its enemies.
- * If they score higher than 255, they go to the next circle.
+ * They are stuck here, and dying doesn't make anything better.
  * Runnable after boot */
 class Level7 extends Phaser.Scene {
 
@@ -40,9 +40,12 @@ class Level7 extends Phaser.Scene {
         this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
         // add and set text objects
         Scores.initText(this);
-        myVoice.speak(`The Fifth Circle of Hell is where the wrathful and sullen are punished for their sins. Transported on a boat by Phlegyas, Dante and Virgil see the furious fighting each other on the surface of the river Styx and the sullen gurgling beneath the surface of the water.`);
+        !this.gameFinished && myVoice.speak(`The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.`);
         // Add event listener for shooting while space is pressed down
-        this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
+        (!this.gameFinished) && this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });
+        (this.gameFinished) && this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 50); });
+
+
         this.input.keyboard.on('keyup-SPACE', () => { clearInterval(this.shootInterval); });
     }
 

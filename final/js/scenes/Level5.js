@@ -1,8 +1,9 @@
 /** Creates the scene for the 5th circle, Wrath.
  * The player must murder its enemies.
- * They are stuck here, and dying doesn't make anything better.
+ * If they score higher than 255, they go to the next circle.
  * Runnable after boot */
 class Level5 extends Phaser.Scene {
+
     /** allows the creation of a scene for the war game, initializing it with required params */
     constructor() {
         super({
@@ -39,7 +40,7 @@ class Level5 extends Phaser.Scene {
         this.user.body.angularDrag = 120;
         this.userHp = 100;
         this.cameras.main.startFollow(this.user);
-        this.firstLoss && myVoice.speak("The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.");
+        this.firstLoss && myVoice.speak("The Fifth Circle of Hell is where the wrathful and sullen are punished for their sins. Transported on a boat by Phlegyas, Dante and Virgil see the furious fighting each other on the surface of the river Styx and the sullen gurgling beneath the surface of the water.");
         this.bulletsPlayer = this.add.group();
         this.bulletsEnemies = this.add.group();
         this.healing = this.add.group();
@@ -128,6 +129,7 @@ class Level5 extends Phaser.Scene {
                 this.scene.restart();
                 this.gameLost = false;
             } else {
+                infernoStage++;
                 this.scene.start('level6');
             }
         }
