@@ -1,8 +1,15 @@
 /** 9 Circles
  * @author Nicolas Morales-Sanabria
  * 
-*/
-
+ * You awake stressing out, was it a bad dream? where are you?
+ * As you seem to dive into madness, will you get stuck in violence?
+ * The program seeks to take the player through 9 levels, but got stuck on the 7th. Based on the divine comedy by Dante.
+ * 
+ * Use the arrow keys and spacebar to move and attack enemies, sometimes you must die to progress further.
+ * 
+ * Attributions:
+ * The images featured in this project belong to their respective owners and are used for educational purposes.
+ * The music/sounds featured in this project belong to their respective owners and are used for educational purposes.  */
 "use strict";
 setInterval(moveBackground, 50);
 let backgroundPos = 0;
@@ -38,7 +45,7 @@ let config = {
             gravity: { y: 0 }
         }
     },
-    scene: [Boot, Level1, Level2, Level3, Level4, Level5, Level6, Level7]
+    scene: [Boot, Level0, Level1, Level2, Level3, Level4, Level5, Level6, Level7]
 };
 myVoice.setPitch(0.1);
 let game = new Phaser.Game(config);

@@ -1,6 +1,6 @@
 /** Creates the scene for the 1st circle, Limbo.
- * The player must throw bullets towards hostile crowds to avoid getting lapidated.
- * If the player scores higher than 255, they will move into the next circle
+ * The player must throw rocks towards hostile crowds to avoid getting lapidated.
+ * When they die, they will move into the next circle
  * Runnable after boot */
 class Level1 extends Phaser.Scene {
 

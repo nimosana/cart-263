@@ -40,6 +40,7 @@ class Level7 extends Phaser.Scene {
         this.physics.add.overlap(this.healing, this.user, this.userHealCollider, null, this);
         // add and set text objects
         Scores.initText(this);
+        this.diedText.setText('YOU STAY HERE\nEnter to restart');
         !this.gameFinished && myVoice.speak(`The Seventh Circle of Hell is divided into three rings. The Outer Ring houses murderers and others who were violent to other people and property. In the Middle Ring, the poet sees suicides who have been turned into trees and bushes which are fed upon by harpies. But he also sees here profligates, chased and torn to pieces by dogs. In the Inner Ring are blasphemers and sodomites, residing in a desert of burning sand and burning rain falling from the sky.`);
         // Add event listener for shooting while space is pressed down
         (!this.gameFinished) && this.input.keyboard.on('keydown-SPACE', () => { this.shootInterval = setInterval(() => { this.userShoot(); }, 200); });

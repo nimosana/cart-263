@@ -1,6 +1,6 @@
 /** Creates the scene for the 5th circle, Wrath.
  * The player must murder its enemies.
- * If they score higher than 255, they go to the next circle.
+ * When they die, they go to the next circle.
  * Runnable after boot */
 class Level5 extends Phaser.Scene {
 
