@@ -34,6 +34,7 @@ function preload() {
 function setup() {
     let musicPlayer = new PlaylistPlayer(`soundtrack`, playlist);
     musicPlayer.playlistStart();
+    musicPlayer.playlistVolume(0.6);
 }
 
 let config = {
