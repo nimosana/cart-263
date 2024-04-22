@@ -27,23 +27,23 @@ function preload() {
 function setup() {
     let musicPlayer = new PlaylistPlayer(`soundtrack`, playlist);
     musicPlayer.playlistStart();
+    let config = {
+        type: Phaser.AUTO,
+        width: 900,
+        height: 900,
+        physics: {
+            default: 'arcade', arcade: {
+                gravity: { y: 0 }
+            }
+        },
+        scene: [Boot, Level1, Level2, Level3, Level4, Level5, Level6, Level7]
+    };
+    let infernoStage = 1;
+    let game = new Phaser.Game(config);
+    let bulletTypes = ['nothin', 'rock', `heart`, 'nothin', `bullet`, `bullet`, `bullet`];
 }
 
-let config = {
-    type: Phaser.AUTO,
-    width: 900,
-    height: 900,
-    physics: {
-        default: 'arcade', arcade: {
-            gravity: { y: 0 }
-        }
-    },
-    scene: [Boot, Level1, Level2, Level3, Level4, Level5, Level6, Level7]
-};
 myVoice.setPitch(0.1);
-let game = new Phaser.Game(config);
-let infernoStage = 1;
-let bulletTypes = ['nothin', 'rock', `heart`, 'nothin', 'nothin', `bullet`, `bullet`, `bullet`];
 
 /** move the background of the html site */
 function moveBackground() {

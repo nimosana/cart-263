@@ -26,7 +26,7 @@ class Level4 extends Phaser.Scene {
         this.ground = this.add.tileSprite(0, 0, 1800, 1800, 'greedFloor').setScrollFactor(0, 0);
         // create and setup groups, objects, physics, camera
         this.monies = this.physics.add.group();
-        for (let i = 0; i < 3000; i++) {
+        for (let i = 0; i < 4000; i++) {
             let randomX = Phaser.Math.RND.realInRange(-game.config.width * 20, game.config.width * 20);
             let randomY = Phaser.Math.RND.realInRange(-game.config.width * 20, game.config.width * 20);
             this.monies.create(randomX, randomY, 'money');
